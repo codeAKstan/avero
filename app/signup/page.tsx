@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { User, Mail, Lock, ArrowRight, Eye, EyeOff, GraduationCap, School } from "lucide-react";
+import gsap from "gsap";
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,70 +13,84 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"student" | "educator">("student");
 
+  const cardRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+    if (logoRef.current) {
+      tl.fromTo(logoRef.current, { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 });
+    }
+    if (cardRef.current) {
+      tl.fromTo(cardRef.current, { y: 30, opacity: 0, scale: 0.96 }, { y: 0, opacity: 1, scale: 1, duration: 0.7 }, "-=0.3");
+    }
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Form submission logic placeholder
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f8ff] bg-dot-pattern flex flex-col justify-center items-center px-4 py-12 selection:bg-[#2866e1]/20 selection:text-[#0f172a]">
+    <div className="min-h-screen bg-[#f5f8ff] bg-dot-pattern flex flex-col justify-center items-center px-4 py-8 sm:py-12 selection:bg-[#2866e1]/20 selection:text-[#0f172a]">
       {/* Top Header Logo */}
-      <div className="mb-8">
+      <div ref={logoRef} className="mb-6 sm:mb-8">
         <Link href="/" className="inline-block transition-transform hover:scale-105">
           <Image
             src="/images/logo.png"
             alt="Avero logo"
             width={360}
             height={100}
-            className="h-16 sm:h-20 md:h-24 w-auto object-contain"
+            className="h-12 sm:h-18 md:h-20 w-auto object-contain"
             priority
           />
         </Link>
       </div>
 
       {/* Main Signup Card */}
-      <div className="w-full max-w-md bg-white border border-slate-200/80 rounded-3xl p-8 sm:p-10 shadow-xl shadow-slate-200/50">
-        <div className="text-center mb-8">
-          <h1 className="font-[family-name:var(--font-montserrat)] font-bold text-2xl sm:text-3xl text-[#0f172a] mb-2">
+      <div ref={cardRef} className="w-full max-w-md bg-white border border-slate-200/80 rounded-2xl sm:rounded-3xl p-6 sm:p-10 shadow-xl shadow-slate-200/50">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="font-[family-name:var(--font-montserrat)] font-bold text-xl sm:text-3xl text-[#0f172a] mb-1.5 sm:mb-2">
             Create your account
           </h1>
-          <p className="text-slate-500 text-sm">
+          <p className="text-slate-500 text-xs sm:text-sm">
             Start studying smarter with instructor-aligned materials
           </p>
         </div>
 
         {/* Role Selector Tabs */}
-        <div className="grid grid-cols-2 gap-2 p-1.5 bg-slate-100/80 rounded-2xl mb-6">
+        <div className="grid grid-cols-2 gap-1.5 p-1.5 bg-slate-100/80 rounded-2xl mb-5 sm:mb-6">
           <button
             type="button"
             onClick={() => setRole("student")}
-            className={`py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all ${role === "student"
+            className={`py-2 sm:py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition-all ${role === "student"
               ? "bg-white text-[#2866e1] shadow-sm"
               : "text-slate-500 hover:text-slate-800"
               }`}
           >
-            <GraduationCap className="w-4 h-4" />
+            <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             I&apos;m a Student
           </button>
           <button
             type="button"
-            onClick={() => setRole("educator")}
-            className={`py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all ${role === "educator"
-              ? "bg-white text-[#2866e1] shadow-sm"
-              : "text-slate-500 hover:text-slate-800"
-              }`}
+            disabled
+            aria-disabled="true"
+            className="py-2 sm:py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition-all text-slate-400 opacity-50 cursor-not-allowed bg-transparent"
           >
-            <School className="w-4 h-4" />
-            I&apos;m an Educator
+            <School className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" />
+            <span>I&apos;m an Educator</span>
+            <span className="text-[9px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded font-mono font-normal">
+              Soon
+            </span>
           </button>
         </div>
 
         {/* Social Signup Button */}
         <button
           type="button"
-          className="w-full py-3 px-4 rounded-xl border border-slate-200 hover:bg-slate-50 font-medium text-slate-700 text-sm flex items-center justify-center gap-3 transition-colors shadow-sm mb-6"
+          className="w-full py-2.5 sm:py-3 px-4 rounded-xl border border-slate-200 hover:bg-slate-50 font-medium text-slate-700 text-xs sm:text-sm flex items-center justify-center gap-3 transition-colors shadow-sm mb-5 sm:mb-6"
         >
-          <svg className="w-5 h-5" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24">
             <path
               fill="#4285F4"
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -97,18 +112,18 @@ export default function SignupPage() {
         </button>
 
         {/* Divider */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 mb-5 sm:mb-6">
           <div className="flex-1 h-px bg-slate-200"></div>
-          <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+          <span className="text-[10px] sm:text-xs font-medium text-slate-400 uppercase tracking-wider">
             or
           </span>
           <div className="flex-1 h-px bg-slate-200"></div>
         </div>
 
         {/* Signup Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+            <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5 sm:mb-2">
               Full Name
             </label>
             <div className="relative">
@@ -121,13 +136,13 @@ export default function SignupPage() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Jane Doe"
-                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#2866e1]/40 focus:border-[#2866e1] transition-all"
+                className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#2866e1]/40 focus:border-[#2866e1] transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+            <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5 sm:mb-2">
               Email
             </label>
             <div className="relative">
@@ -140,13 +155,13 @@ export default function SignupPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="example@domain.com"
-                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#2866e1]/40 focus:border-[#2866e1] transition-all"
+                className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#2866e1]/40 focus:border-[#2866e1] transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+            <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5 sm:mb-2">
               Create Password
             </label>
             <div className="relative">
@@ -159,7 +174,7 @@ export default function SignupPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Must be at least 8 characters"
-                className="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#2866e1]/40 focus:border-[#2866e1] transition-all"
+                className="w-full pl-10 pr-10 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#2866e1]/40 focus:border-[#2866e1] transition-all"
               />
               <button
                 type="button"
@@ -175,7 +190,7 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <div className="text-xs text-slate-500 pt-1 leading-relaxed">
+          <div className="text-[11px] sm:text-xs text-slate-500 pt-0.5 leading-relaxed">
             By signing up, you agree to Avero&apos;s{" "}
             <a href="#terms" className="text-[#2866e1] hover:underline">
               Terms of Service
@@ -189,7 +204,7 @@ export default function SignupPage() {
 
           <button
             type="submit"
-            className="w-full py-3.5 px-4 rounded-xl bg-[#2866e1] hover:bg-[#1d52bf] text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-[#2866e1]/25 group mt-2"
+            className="w-full py-3 sm:py-3.5 px-4 rounded-xl bg-[#2866e1] hover:bg-[#1d52bf] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-[#2866e1]/25 group mt-2"
           >
             <span>Create Account</span>
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -197,8 +212,8 @@ export default function SignupPage() {
         </form>
 
         {/* Footer Navigation */}
-        <div className="text-center mt-8 pt-6 border-t border-slate-100">
-          <p className="text-slate-600 text-sm">
+        <div className="text-center mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-slate-100">
+          <p className="text-slate-600 text-xs sm:text-sm">
             Already have an account?{" "}
             <Link
               href="/login"

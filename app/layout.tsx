@@ -21,7 +21,7 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "Avero - Study smarter. Get tested on what actually matters.",
   description:
-    "Upload your lecture slides, notes, or textbook chapters. Avero's AI turns them into exam-style quizzes reviewed by your instructors.",
+    "Upload your lecture slides, notes, or textbook chapters. Avero turns them into exam-style quizzes reviewed by your instructors.",
   icons: {
     icon: "/images/favicon.png",
     shortcut: "/images/favicon.png",
