@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/User";
 import { sendWelcomeEmail } from "@/lib/email";
+import { signUserToken, USER_COOKIE_NAME } from "@/lib/userAuth";
 
 export async function POST(request: Request) {
   try {
@@ -65,7 +66,13 @@ export async function POST(request: Request) {
       content: `Dear ${fullName},\n\nWelcome to AVERO ACADEMY! Your account has been saved in our MongoDB database and initialized for ${studentType || "Healthcare Candidate"} at ${university || "School of Nursing"}.\n\nA confirmation email has been dispatched to ${normalizedEmail}.`,
     };
 
-    return NextResponse.json(
+    const token = signUserToken({
+      userId: (user._id as any).toString(),
+      email: user.email,
+      role: user.role,
+    });
+
+    const response = NextResponse.json(
       {
         success: true,
         message: "User saved to MongoDB and welcome email sent.",
@@ -85,6 +92,17 @@ export async function POST(request: Request) {
       },
       { status: 200 }
     );
+
+    response.cookies.set({
+      name: USER_COOKIE_NAME,
+      value: token,
+      httpOnly: true,
+      path: "/",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60,
+    });
+
+    return response;
   } catch (error: any) {
     console.error("Signup API error:", error);
     return NextResponse.json(

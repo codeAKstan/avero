@@ -3,13 +3,17 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Mail, Lock, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import gsap from "gsap";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const cardRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
@@ -24,9 +28,36 @@ export default function LoginPage() {
     }
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Form submission logic placeholder
+    if (!email) return;
+
+    setLoading(true);
+    setErrorMsg("");
+
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+      if (data.success && data.user) {
+        if (!data.user.isOnboarded) {
+          router.push("/onboarding");
+        } else {
+          router.push("/dashboard");
+        }
+      } else {
+        setErrorMsg(data.error || "Login failed. Please try again.");
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setErrorMsg("An unexpected error occurred.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -164,12 +195,28 @@ export default function LoginPage() {
             </label>
           </div>
 
+          {errorMsg && (
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold text-center">
+              {errorMsg}
+            </div>
+          )}
+
           <button
             type="submit"
-            className="w-full py-3 sm:py-3.5 px-4 rounded-xl bg-[#2866e1] hover:bg-[#1d52bf] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-[#2866e1]/25 group mt-2"
+            disabled={loading}
+            className="w-full py-3 sm:py-3.5 px-4 rounded-xl bg-[#2866e1] hover:bg-[#1d52bf] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-[#2866e1]/25 group mt-2 cursor-pointer"
           >
-            <span>Log in</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Logging in...</span>
+              </>
+            ) : (
+              <>
+                <span>Log in</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+              </>
+            )}
           </button>
         </form>
 

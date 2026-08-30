@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/User";
+import { signUserToken, USER_COOKIE_NAME } from "@/lib/userAuth";
 
 export async function POST(request: Request) {
   try {
@@ -31,7 +32,13 @@ export async function POST(request: Request) {
       });
     }
 
-    return NextResponse.json(
+    const token = signUserToken({
+      userId: (user._id as any).toString(),
+      email: user.email,
+      role: user.role,
+    });
+
+    const response = NextResponse.json(
       {
         success: true,
         message: "Login successful.",
@@ -48,6 +55,17 @@ export async function POST(request: Request) {
       },
       { status: 200 }
     );
+
+    response.cookies.set({
+      name: USER_COOKIE_NAME,
+      value: token,
+      httpOnly: true,
+      path: "/",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60,
+    });
+
+    return response;
   } catch (error: any) {
     console.error("Login API error:", error);
     return NextResponse.json(

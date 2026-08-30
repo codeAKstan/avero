@@ -1,0 +1,626 @@
+"use client";
+
+import { useEffect, useState, use } from "react";
+import { useRouter } from "next/navigation";
+import {
+  BookOpen,
+  ArrowLeft,
+  HelpCircle,
+  FileText,
+  Plus,
+  Trash2,
+  CheckCircle2,
+  Loader2,
+  Image as ImageIcon,
+  Check,
+} from "lucide-react";
+import { UploadButton } from "@/lib/uploadthing";
+
+export default function EditCoursePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
+  const router = useRouter();
+
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  // Course State
+  const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [subcategoryName, setSubcategoryName] = useState("");
+  const [description, setDescription] = useState("");
+  const [thumbnail, setThumbnail] = useState("");
+  const [level, setLevel] = useState<"Beginner" | "Intermediate" | "Advanced">("Intermediate");
+  const [status, setStatus] = useState<"Draft" | "Published" | "Archived">("Draft");
+
+  // Exam Engine Settings
+  const [timeLimitMinutes, setTimeLimitMinutes] = useState(60);
+  const [passingScorePercentage, setPassingScorePercentage] = useState(75);
+  const [allowedModes, setAllowedModes] = useState<("Practice" | "Exam")[]>(["Practice", "Exam"]);
+
+  // Modules & Questions
+  const [modules, setModules] = useState<
+    { title: string; content: string; order: number; estimatedMinutes: number }[]
+  >([]);
+
+  const [questions, setQuestions] = useState<
+    { question: string; options: string[]; correctAnswer: string; explanation: string }[]
+  >([]);
+
+  useEffect(() => {
+    // Fetch categories
+    fetch("/api/admin/categories")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) setCategories(data.categories || []);
+      });
+
+    // Fetch course details
+    fetch(`/api/admin/courses/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.course) {
+          const c = data.course;
+          setTitle(c.title || "");
+          setSlug(c.slug || "");
+          setCategoryId(c.categoryId?._id || c.categoryId || "");
+          setSubcategoryName(c.subcategoryName || "");
+          setDescription(c.description || "");
+          setThumbnail(c.thumbnail || "");
+          setLevel(c.level || "Intermediate");
+          setStatus(c.status || "Draft");
+          setTimeLimitMinutes(typeof c.timeLimitMinutes === "number" ? c.timeLimitMinutes : 60);
+          setPassingScorePercentage(typeof c.passingScorePercentage === "number" ? c.passingScorePercentage : 75);
+          setAllowedModes(Array.isArray(c.allowedModes) && c.allowedModes.length > 0 ? c.allowedModes : ["Practice", "Exam"]);
+          setModules(Array.isArray(c.modules) ? c.modules : []);
+          setQuestions(Array.isArray(c.questions) ? c.questions : []);
+        }
+      })
+      .catch((err) => console.error("Failed to load course", err))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  const selectedCategory = categories.find((c) => c._id === categoryId);
+  const availableSubcategories = selectedCategory?.subcategories || [];
+
+  const handleTitleChange = (val: string) => {
+    setTitle(val);
+    const autoSlug = val
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-");
+    setSlug(autoSlug);
+  };
+
+  // Questions handlers
+  const addQuestion = () => {
+    setQuestions((prev) => [
+      ...prev,
+      {
+        question: `Question ${prev.length + 1}: Enter question text...`,
+        options: ["A. Option 1", "B. Option 2", "C. Option 3", "D. Option 4"],
+        correctAnswer: "A. Option 1",
+        explanation: "Clinical rationale explaining why this option is correct.",
+      },
+    ]);
+  };
+
+  const updateQuestion = (index: number, field: string, value: any) => {
+    setQuestions((prev) =>
+      prev.map((q, i) => (i === index ? { ...q, [field]: value } : q))
+    );
+  };
+
+  const updateQuestionOption = (qIndex: number, optIndex: number, val: string) => {
+    setQuestions((prev) =>
+      prev.map((q, i) => {
+        if (i !== qIndex) return q;
+        const newOpts = [...q.options];
+        const oldVal = newOpts[optIndex];
+        newOpts[optIndex] = val;
+        let newCorrect = q.correctAnswer;
+        if (q.correctAnswer === oldVal) {
+          newCorrect = val;
+        }
+        return { ...q, options: newOpts, correctAnswer: newCorrect };
+      })
+    );
+  };
+
+  const removeQuestion = (index: number) => {
+    setQuestions((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Modules handlers
+  const addModule = () => {
+    setModules((prev) => [
+      ...prev,
+      {
+        title: `Module ${prev.length + 1}: New Topic`,
+        content: "Lesson content details...",
+        order: prev.length + 1,
+        estimatedMinutes: 15,
+      },
+    ]);
+  };
+
+  const updateModule = (index: number, field: string, value: any) => {
+    setModules((prev) =>
+      prev.map((m, i) => (i === index ? { ...m, [field]: value } : m))
+    );
+  };
+
+  const removeModule = (index: number) => {
+    setModules((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !categoryId || !description) {
+      alert("Title, Category, and Description are required.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/courses/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          slug,
+          categoryId,
+          subcategoryName,
+          description,
+          thumbnail,
+          level,
+          status,
+          timeLimitMinutes,
+          passingScorePercentage,
+          allowedModes,
+          modules,
+          questions,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save course changes");
+
+      router.push("/admin/courses");
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="py-24 flex justify-center items-center text-slate-500 gap-3">
+        <Loader2 className="w-7 h-7 animate-spin text-[#2866e1]" />
+        <span className="text-sm font-semibold">Loading course and questions repository...</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8 animate-in fade-in max-w-5xl mx-auto pb-16">
+      {/* Top Header Bar */}
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => router.push("/admin/courses")}
+          className="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-900 transition cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back to Courses & Question Banks
+        </button>
+
+        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+          Edit Course ID: #{id.slice(-6)}
+        </span>
+      </div>
+
+      {/* Main Form */}
+      <form onSubmit={handleSave} className="bg-white border border-slate-200/80 rounded-2xl p-6 md:p-8 space-y-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+          <h1 className="text-xl font-extrabold text-slate-900 flex items-center gap-2.5">
+            <BookOpen className="w-6 h-6 text-[#2866e1]" /> Edit Course & Past Question Bank
+          </h1>
+        </div>
+
+        {/* Metadata Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+          <div>
+            <label className="block text-slate-700 font-semibold mb-1">Course Title *</label>
+            <input
+              type="text"
+              required
+              value={title}
+              onChange={(e) => handleTitleChange(e.target.value)}
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold focus:border-[#2866e1]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-700 font-semibold mb-1">URL Slug</label>
+            <input
+              type="text"
+              required
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900"
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-700 font-semibold mb-1">Category *</label>
+            <select
+              value={categoryId}
+              onChange={(e) => {
+                setCategoryId(e.target.value);
+                setSubcategoryName("");
+              }}
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold"
+            >
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat._id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-slate-700 font-semibold mb-1">Subcategory (Optional)</label>
+            <select
+              value={subcategoryName}
+              onChange={(e) => setSubcategoryName(e.target.value)}
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900"
+            >
+              <option value="">None (Whole Category)</option>
+              {availableSubcategories.map((sub: any, idx: number) => {
+                const subName = typeof sub === "string" ? sub : sub.name;
+                return (
+                  <option key={idx} value={subName}>
+                    {subName}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-slate-700 font-semibold mb-1">Difficulty Level</label>
+            <select
+              value={level}
+              onChange={(e: any) => setLevel(e.target.value)}
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold"
+            >
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-slate-700 font-semibold mb-1">Publish Status</label>
+            <select
+              value={status}
+              onChange={(e: any) => setStatus(e.target.value)}
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold"
+            >
+              <option value="Draft">Draft (Hidden)</option>
+              <option value="Published">Published (Live for Student Testing)</option>
+              <option value="Archived">Archived</option>
+            </select>
+          </div>
+
+          {/* Exam Timer */}
+          <div>
+            <label className="block text-slate-700 font-semibold mb-1">Exam Time Limit (Minutes)</label>
+            <input
+              type="number"
+              min={5}
+              max={360}
+              value={timeLimitMinutes}
+              onChange={(e) => setTimeLimitMinutes(parseInt(e.target.value, 10) || 60)}
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold"
+            />
+          </div>
+
+          {/* Passing Threshold */}
+          <div>
+            <label className="block text-slate-700 font-semibold mb-1">Passing Threshold Score (%)</label>
+            <input
+              type="number"
+              min={10}
+              max={100}
+              value={passingScorePercentage}
+              onChange={(e) => setPassingScorePercentage(parseInt(e.target.value, 10) || 75)}
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold"
+            />
+          </div>
+
+          {/* Allowed Testing Modes */}
+          <div>
+            <label className="block text-slate-700 font-semibold mb-1">Allowed Candidate Testing Modes</label>
+            <div className="flex items-center gap-4 p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+              <label className="flex items-center gap-2 cursor-pointer font-medium text-slate-800">
+                <input
+                  type="checkbox"
+                  checked={allowedModes.includes("Practice")}
+                  onChange={(e) => {
+                    if (e.target.checked) setAllowedModes((prev) => [...prev, "Practice"]);
+                    else setAllowedModes((prev) => prev.filter((m) => m !== "Practice"));
+                  }}
+                  className="w-4 h-4 text-[#2866e1] rounded border-slate-300"
+                />
+                Practice (Instant Rationales)
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer font-medium text-slate-800">
+                <input
+                  type="checkbox"
+                  checked={allowedModes.includes("Exam")}
+                  onChange={(e) => {
+                    if (e.target.checked) setAllowedModes((prev) => [...prev, "Exam"]);
+                    else setAllowedModes((prev) => prev.filter((m) => m !== "Exam"));
+                  }}
+                  className="w-4 h-4 text-[#2866e1] rounded border-slate-300"
+                />
+                Exam Simulation (Timed)
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Description */}
+        <div className="text-xs">
+          <label className="block text-slate-700 font-semibold mb-1">Description / Overview *</label>
+          <textarea
+            rows={3}
+            required
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900"
+          />
+        </div>
+
+        {/* Thumbnail Image Upload */}
+        <div className="text-xs">
+          <label className="block text-slate-700 font-semibold mb-2">Cover Thumbnail Image (UploadThing)</label>
+          <div className="flex items-center gap-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            {thumbnail ? (
+              <img src={thumbnail} alt="Thumbnail" className="w-20 h-16 rounded-lg object-cover border border-slate-200" />
+            ) : (
+              <div className="w-20 h-16 rounded-lg bg-slate-100 border border-slate-200 text-slate-400 flex items-center justify-center">
+                <ImageIcon className="w-6 h-6" />
+              </div>
+            )}
+
+            <div className="flex-1">
+              <UploadButton
+                endpoint="imageUploader"
+                onClientUploadComplete={(res) => {
+                  if (res && res[0]) {
+                    setThumbnail(res[0].ufsUrl || res[0].url);
+                  }
+                }}
+                onUploadError={(error: Error) => {
+                  alert(`Image upload error: ${error.message}`);
+                }}
+                appearance={{
+                  button: "bg-slate-200 hover:bg-slate-300 text-xs font-semibold text-slate-800 py-2 px-4 rounded-lg border border-slate-300 cursor-pointer",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* PAST QUESTIONS EDITOR SECTION */}
+        <div className="pt-6 border-t border-slate-100 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <HelpCircle className="w-5 h-5 text-emerald-600" /> Questions Bank ({questions.length} Questions)
+              </h3>
+              <p className="text-xs text-slate-500">View, edit, add options, and update rationales for test items.</p>
+            </div>
+            <button
+              type="button"
+              onClick={addQuestion}
+              className="px-3.5 py-2 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 text-emerald-800 text-xs font-bold rounded-xl flex items-center gap-1.5 transition cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" /> Add Question
+            </button>
+          </div>
+
+          {questions.length === 0 ? (
+            <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-xl text-slate-500 text-xs">
+              No questions found in this question bank. Click "Add Question" above to create one.
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {questions.map((q, qIdx) => (
+                <div key={qIdx} className="p-5 bg-slate-50/80 border border-slate-200 rounded-xl space-y-4 shadow-xs">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
+                      Question #{qIdx + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeQuestion(qIdx)}
+                      className="text-slate-400 hover:text-rose-600 transition"
+                      title="Delete Question"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Question Prompt</label>
+                    <textarea
+                      rows={2}
+                      value={q.question}
+                      onChange={(e) => updateQuestion(qIdx, "question", e.target.value)}
+                      placeholder="Enter question statement..."
+                      className="w-full p-3 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold"
+                    />
+                  </div>
+
+                  {/* Multiple Choice Options */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-2">Options & Select Correct Answer</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {q.options.map((opt, optIdx) => (
+                        <div
+                          key={optIdx}
+                          className={`flex items-center gap-2 p-2 bg-white border rounded-lg ${
+                            q.correctAnswer === opt ? "border-emerald-500/80 bg-emerald-50/60" : "border-slate-200"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name={`correct_${qIdx}`}
+                            checked={q.correctAnswer === opt}
+                            onChange={() => updateQuestion(qIdx, "correctAnswer", opt)}
+                            className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={opt}
+                            onChange={(e) => updateQuestionOption(qIdx, optIdx, e.target.value)}
+                            className="w-full bg-transparent text-xs text-slate-900 outline-none font-medium"
+                          />
+                          {q.correctAnswer === opt && (
+                            <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-extrabold shrink-0">
+                              Correct
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Explanation / Rationale */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1">Clinical Rationale / Explanation</label>
+                    <textarea
+                      rows={2}
+                      value={q.explanation}
+                      onChange={(e) => updateQuestion(qIdx, "explanation", e.target.value)}
+                      placeholder="Explain why the selected option is correct..."
+                      className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 italic"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* LESSON MODULES EDITOR SECTION */}
+        <div className="pt-6 border-t border-slate-100 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[#2866e1]" /> Lesson Modules ({modules.length} Modules)
+              </h3>
+              <p className="text-xs text-slate-500">Edit course lessons and topic summaries.</p>
+            </div>
+            <button
+              type="button"
+              onClick={addModule}
+              className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" /> Add Module
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {modules.map((m, index) => (
+              <div key={index} className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-xs font-bold text-[#2866e1] uppercase tracking-wider">
+                    Lesson {index + 1}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeModule(index)}
+                    className="text-slate-400 hover:text-rose-600 transition"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                  <div className="md:col-span-2">
+                    <input
+                      type="text"
+                      required
+                      value={m.title}
+                      onChange={(e) => updateModule(index, "title", e.target.value)}
+                      placeholder="Module Title"
+                      className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-semibold"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      value={m.estimatedMinutes || 15}
+                      onChange={(e) => updateModule(index, "estimatedMinutes", parseInt(e.target.value, 10) || 15)}
+                      placeholder="Est. Minutes"
+                      className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-slate-900"
+                    />
+                  </div>
+                </div>
+
+                <textarea
+                  rows={3}
+                  required
+                  value={m.content}
+                  onChange={(e) => updateModule(index, "content", e.target.value)}
+                  placeholder="Module lesson content (Markdown supported)..."
+                  className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 font-mono"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Save Bar */}
+        <div className="pt-6 border-t border-slate-100 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => router.push("/admin/courses")}
+            className="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={saving}
+            className="px-6 py-3 bg-[#2866e1] hover:bg-[#1d52bf] text-white font-bold text-xs rounded-xl shadow-md shadow-[#2866e1]/20 flex items-center gap-2 transition disabled:opacity-50 cursor-pointer"
+          >
+            {saving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Saving Changes...</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Save Course & Questions</span>
+              </>
+            )}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}

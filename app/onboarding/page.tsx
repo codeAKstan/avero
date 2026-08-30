@@ -239,10 +239,10 @@ export default function OnboardingPage() {
             Your study profile has been updated for <strong className="text-slate-900">{studentType}</strong> at <strong className="text-slate-900">{university}</strong>.
           </p>
           <Link
-            href="/features"
+            href="/dashboard"
             className="w-full py-3.5 px-4 rounded-xl bg-[#2866e1] hover:bg-[#1d52bf] text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-md"
           >
-            <span>Start Practice Questions</span>
+            <span>Go to Student Dashboard</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
