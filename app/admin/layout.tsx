@@ -177,6 +177,14 @@ export default function AdminLayout({
         </div>
       </aside>
 
+      {/* Mobile Drawer Backdrop Overlay */}
+      {mobileOpen && (
+        <div
+          onClick={() => setMobileOpen(false)}
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 md:hidden"
+        />
+      )}
+
       {/* Main Content Area (Scrollable independently) */}
       <main className="flex-1 min-w-0 h-screen overflow-y-auto flex flex-col">
         <header className="hidden md:flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-40 shadow-xs">
@@ -200,7 +208,7 @@ export default function AdminLayout({
           </div>
         </header>
 
-        <div className="flex-1 p-6 md:p-8">{children}</div>
+        <div className="flex-1 p-4 sm:p-6 md:p-8">{children}</div>
       </main>
     </div>
   );

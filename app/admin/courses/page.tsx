@@ -159,18 +159,19 @@ export default function CourseManagementPage() {
           <p className="text-sm text-slate-500 font-medium mt-0.5">View, edit, publish, or convert past question documents into testing modules.</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full md:w-auto">
           <Link
             href="/admin/courses/new"
-            className="px-4 py-2.5 bg-[#2866e1] hover:bg-[#1d52bf] text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-md shadow-[#2866e1]/20 transition cursor-pointer"
+            className="w-full md:w-auto justify-center px-4 py-2.5 bg-[#2866e1] hover:bg-[#1d52bf] text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-md shadow-[#2866e1]/20 transition cursor-pointer"
           >
+            <Sparkles className="w-4 h-4 shrink-0" />
             <span>Create Course (OCR AI or Manual)</span>
           </Link>
         </div>
       </div>
 
       {/* Search & Filter Bar */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col md:flex-row gap-4 justify-between items-center shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
         <div className="relative w-full md:w-80">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
@@ -182,14 +183,14 @@ export default function CourseManagementPage() {
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-          <div className="flex items-center gap-2">
-            <FolderTree className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-xs text-slate-500 font-semibold">Category:</span>
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 w-full md:w-auto">
+          <div className="flex items-center gap-2 flex-1 sm:flex-none">
+            <FolderTree className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <span className="text-xs text-slate-500 font-semibold shrink-0">Category:</span>
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="bg-slate-50 border border-slate-200 text-xs text-slate-800 rounded-xl px-3 py-2 focus:outline-none focus:border-[#2866e1]"
+              className="bg-slate-50 border border-slate-200 text-xs text-slate-800 rounded-xl px-3 py-2 focus:outline-none focus:border-[#2866e1] w-full"
             >
               <option value="all">All Categories</option>
               {categories.map((c) => (
@@ -200,12 +201,12 @@ export default function CourseManagementPage() {
             </select>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500 font-semibold">Status:</span>
+          <div className="flex items-center gap-2 flex-1 sm:flex-none">
+            <span className="text-xs text-slate-500 font-semibold shrink-0">Status:</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-slate-50 border border-slate-200 text-xs text-slate-800 rounded-xl px-3 py-2 focus:outline-none focus:border-[#2866e1]"
+              className="bg-slate-50 border border-slate-200 text-xs text-slate-800 rounded-xl px-3 py-2 focus:outline-none focus:border-[#2866e1] w-full"
             >
               <option value="all">All Statuses</option>
               <option value="Published">Published</option>
@@ -216,7 +217,7 @@ export default function CourseManagementPage() {
 
           <button
             onClick={fetchCourses}
-            className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition cursor-pointer"
+            className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition cursor-pointer self-end sm:self-auto"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </button>
