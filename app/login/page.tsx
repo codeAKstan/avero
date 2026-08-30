@@ -30,16 +30,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f8ff] bg-dot-pattern flex flex-col justify-center items-center px-4 py-8 sm:py-12 selection:bg-[#2866e1]/20 selection:text-[#0f172a]">
+    <div className="min-h-screen bg-gradient-to-br from-[#e8f0fe] via-white to-[#d2e3fc] bg-dot-pattern flex flex-col justify-center items-center px-4 py-8 sm:py-12 selection:bg-[#2866e1]/20 selection:text-[#0f172a] relative overflow-hidden">
+      {/* Decorative background glow blurs */}
+      <div className="absolute -top-20 left-1/4 w-[500px] h-[500px] bg-[#2866e1]/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-20 right-1/4 w-[500px] h-[500px] bg-[#2866e1]/15 rounded-full blur-3xl pointer-events-none"></div>
+
       {/* Top Header Logo */}
       <div ref={logoRef} className="mb-6 sm:mb-8">
         <Link href="/" className="inline-block transition-transform hover:scale-105">
           <Image
             src="/images/logo.png"
             alt="Avero logo"
-            width={360}
-            height={100}
-            className="h-12 sm:h-18 md:h-20 w-auto object-contain"
+            width={440}
+            height={140}
+            className="h-16 sm:h-20 md:h-24 lg:h-28 w-auto object-contain drop-shadow-md"
             priority
           />
         </Link>

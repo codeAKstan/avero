@@ -108,7 +108,7 @@ export function Pricing() {
             </div>
             <div className="flex items-baseline gap-1 mb-2">
               <span className="font-[family-name:var(--font-montserrat)] font-extrabold text-3xl sm:text-4xl text-slate-900">
-                $6
+                $2
               </span>
               <span className="text-slate-500 text-xs sm:text-sm font-medium">/ month</span>
             </div>

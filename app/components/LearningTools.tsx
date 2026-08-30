@@ -100,14 +100,11 @@ export function LearningTools() {
                 <div className="flex items-center gap-2">
                   <span className="bg-[#2866e1] text-white px-3 py-0.5 sm:py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm font-[family-name:var(--font-montserrat)]">
                     Avero Academy
-                    <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-mono font-normal">
-                      NURSING
-                    </span>
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 sm:px-3 py-1 rounded-full">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  Council Ready · 95% Mastery
+                  NURSING
                 </div>
               </div>
 
