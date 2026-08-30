@@ -87,6 +87,12 @@ export function Header() {
             How it works
           </Link>
           <Link
+            href="/about"
+            className="hover:text-slate-900 transition-colors"
+          >
+            About Us
+          </Link>
+          <Link
             href="/for-educators"
             className="hover:text-slate-900 transition-colors"
           >
@@ -155,6 +161,13 @@ export function Header() {
               className="mobile-nav-item py-2 px-3 rounded-xl hover:bg-slate-50 transition-colors"
             >
               How it works
+            </Link>
+            <Link
+              href="/about"
+              onClick={() => setIsOpen(false)}
+              className="mobile-nav-item py-2 px-3 rounded-xl hover:bg-slate-50 transition-colors"
+            >
+              About Us
             </Link>
             <Link
               href="/for-educators"

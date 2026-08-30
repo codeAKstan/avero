@@ -34,11 +34,11 @@ export function Testimonials() {
         }
       );
 
-      // Stat 1: 0% -> 94%
+      // Stat 1: 0% -> 96%
       if (stat1Ref.current) {
         const obj = { val: 0 };
         gsap.to(obj, {
-          val: 94,
+          val: 96,
           duration: 1.5,
           ease: "power1.out",
           scrollTrigger: {
@@ -51,11 +51,11 @@ export function Testimonials() {
         });
       }
 
-      // Stat 2: 0M+ -> 10M+
+      // Stat 2: 0K+ -> 50K+
       if (stat2Ref.current) {
         const obj = { val: 0 };
         gsap.to(obj, {
-          val: 10,
+          val: 50,
           duration: 1.5,
           ease: "power1.out",
           scrollTrigger: {
@@ -63,7 +63,7 @@ export function Testimonials() {
             start: "top 85%",
           },
           onUpdate: () => {
-            if (stat2Ref.current) stat2Ref.current.innerText = `${Math.floor(obj.val)}M+`;
+            if (stat2Ref.current) stat2Ref.current.innerText = `${Math.floor(obj.val)}K+`;
           },
         });
       }
@@ -119,20 +119,20 @@ export function Testimonials() {
           <div className="flex flex-col items-center justify-center p-2">
             <div className="flex items-center gap-2 text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#2866e1] font-[family-name:var(--font-montserrat)] mb-1">
               <Award className="w-6 h-6 sm:w-8 sm:h-8 text-[#2866e1]" />
-              <span ref={stat1Ref}>94%</span>
+              <span ref={stat1Ref}>96%</span>
             </div>
             <div className="text-xs sm:text-sm font-medium text-slate-600">
-              Average Exam Mastery Rate
+              Council Exam Pass Rate
             </div>
           </div>
 
           <div className="flex flex-col items-center justify-center p-2 pt-4 sm:pt-2">
             <div className="flex items-center gap-2 text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#2866e1] font-[family-name:var(--font-montserrat)] mb-1">
               <Users className="w-6 h-6 sm:w-8 sm:h-8 text-[#2866e1]" />
-              <span ref={stat2Ref}>10M+</span>
+              <span ref={stat2Ref}>50K+</span>
             </div>
             <div className="text-xs sm:text-sm font-medium text-slate-600">
-              Practice Questions Answered
+              Past Questions Categorized
             </div>
           </div>
 
@@ -146,7 +146,7 @@ export function Testimonials() {
               <span ref={stat3Ref}>4.9</span>
             </div>
             <div className="text-xs sm:text-sm font-medium text-slate-600">
-              User Satisfaction Rating
+              Student Satisfaction Rating
             </div>
           </div>
         </div>
@@ -154,10 +154,10 @@ export function Testimonials() {
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-10 sm:mb-16">
           <h2 className="font-[family-name:var(--font-montserrat)] font-bold text-2xl sm:text-4xl md:text-[44px] leading-tight text-[#0f172a] tracking-tight mb-3 sm:mb-4">
-            Loved by 10,000+ Healthcare Students & Faculty
+            Loved by 10,000+ Nursing Students &amp; Faculty
           </h2>
           <p className="text-slate-600 text-sm sm:text-lg md:text-xl font-normal max-w-2xl mx-auto">
-            See how Avero helps medical and nursing students ace their exams.
+            See how Avero Academy helps nursing candidates ace their professional council exams.
           </p>
         </div>
 
@@ -175,7 +175,7 @@ export function Testimonials() {
                 <Quote className="w-6 h-6 sm:w-8 sm:h-8 text-[#2866e1]/20" />
               </div>
               <p className="text-slate-700 text-xs sm:text-sm md:text-base leading-relaxed mb-6 italic">
-                &ldquo;Avero transformed my USMLE preparation. Instead of reading endless 1,000-page textbooks, I practiced directly on my course materials and scored 255+ on Step 1!&rdquo;
+                &ldquo;Before Avero Academy, studying mixed past papers was chaotic. Having Pharmacology and Anatomy questions separated into subjects with extracted learning points made all the difference on my council exam!&rdquo;
               </p>
             </div>
             <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
@@ -184,11 +184,11 @@ export function Testimonials() {
               </div>
               <div>
                 <div className="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
-                  Sarah Jenkins, MS3
+                  Sarah Jenkins, RN
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#2866e1]" />
                 </div>
                 <div className="text-[11px] sm:text-xs text-slate-500">
-                  Johns Hopkins School of Medicine
+                  Passed Nursing Council Exam
                 </div>
               </div>
             </div>
@@ -203,10 +203,10 @@ export function Testimonials() {
                     <Star key={i} className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-amber-400 stroke-amber-400" />
                   ))}
                 </div>
-                <Quote className="w-6 h-6 sm:w-8 sm:h-8 text-[#2866e1]/20" />
+                <Quote className="w-8 h-8 text-[#2866e1]/20" />
               </div>
               <p className="text-slate-700 text-xs sm:text-sm md:text-base leading-relaxed mb-6 italic">
-                &ldquo;The knowledge gap analysis is incredible. It automatically identified my weak pharmacology concepts so I knew exactly what to review before my NCLEX boards.&rdquo;
+                &ldquo;The explanations for each option are top-notch. It&apos;s not just about memorizing option B — Avero Academy explains the clinical reasoning so you actually learn the course material.&rdquo;
               </p>
             </div>
             <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
@@ -215,11 +215,11 @@ export function Testimonials() {
               </div>
               <div>
                 <div className="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
-                  Marcus Vance, BSN, RN
+                  Marcus Vance, BSN
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#2866e1]" />
                 </div>
                 <div className="text-[11px] sm:text-xs text-slate-500">
-                  NYU Rory Meyers College of Nursing
+                  Registered Nurse Candidate
                 </div>
               </div>
             </div>
@@ -237,7 +237,7 @@ export function Testimonials() {
                 <Quote className="w-6 h-6 sm:w-8 sm:h-8 text-[#2866e1]/20" />
               </div>
               <p className="text-slate-700 text-xs sm:text-sm md:text-base leading-relaxed mb-6 italic">
-                &ldquo;Avero helped me get ready for my counsel exams with quality questions that were relevant to what I was taught.&rdquo;
+                &ldquo;As a nursing lecturer, I recommend Avero Academy to all my students. It systematically aligns past council exam papers with our syllabus and reinforces academic rigor.&rdquo;
               </p>
             </div>
             <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
@@ -246,11 +246,11 @@ export function Testimonials() {
               </div>
               <div>
                 <div className="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
-                  Dr. Elena Rostova, MD
+                  Dr. Elena Rostova, RN, PhD
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#2866e1]" />
                 </div>
                 <div className="text-[11px] sm:text-xs text-slate-500">
-                  Professor of Pathology, Harvard
+                  Senior Nursing Educator
                 </div>
               </div>
             </div>

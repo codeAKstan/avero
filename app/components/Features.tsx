@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { CheckCircle2, ChevronRight, RotateCcw, Plus, Brain, Target, ShieldCheck } from "lucide-react";
+import { CheckCircle2, ChevronRight, RotateCcw, Plus, Brain, Target, ShieldCheck, BookOpen } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -76,10 +76,10 @@ export function Features() {
       {/* Section Header */}
       <div className="max-w-3xl mx-auto text-center mb-10 sm:mb-16">
         <h2 className="font-[family-name:var(--font-montserrat)] font-bold text-2xl sm:text-4xl md:text-[44px] leading-tight text-[#0f172a] tracking-tight mb-3 sm:mb-4">
-          Get smarter every study session
+          Organized, explanation-driven study system
         </h2>
         <p className="text-slate-600 text-base sm:text-lg md:text-xl font-normal max-w-2xl mx-auto">
-          Built for active learning, not endless scrolling.
+          We turn scattered professional examination past questions into structured subject categories.
         </p>
       </div>
 
@@ -92,12 +92,10 @@ export function Features() {
           {/* Left Column Text Content */}
           <div className="lg:col-span-6 flex flex-col items-start">
             <h3 className="font-[family-name:var(--font-montserrat)] font-bold text-xl sm:text-3xl text-[#0f172a] tracking-tight mb-3 sm:mb-4">
-              Turn knowledge into confidence
+              Turn past examination papers into subject confidence
             </h3>
             <p className="text-slate-600 text-sm sm:text-base md:text-[17px] leading-relaxed mb-6 sm:mb-8">
-              Dynamic questions reinforce key concepts, helping you{" "}
-              <span className="italic font-medium text-slate-900">retain</span>{" "}
-              what really matters.
+              Study one subject at a time with verified correct answers, clear academic explanations, and key learning points.
             </p>
 
             {/* Bullet Point 1 */}
@@ -107,11 +105,10 @@ export function Features() {
               </div>
               <div className="text-xs sm:text-base leading-snug">
                 <strong className="text-[#0f172a] font-semibold">
-                  Learn actively, not passively:
+                  Subject-Categorized Past Questions:
                 </strong>{" "}
                 <span className="text-slate-600">
-                  Every quiz strengthens recall and clinical reasoning instead of
-                  just testing memory.
+                  Scattered past papers organized into Anatomy, Pharmacology, Medical-Surgical Nursing, and Nursing Fundamentals.
                 </span>
               </div>
             </div>
@@ -123,11 +120,10 @@ export function Features() {
               </div>
               <div className="text-xs sm:text-base leading-snug">
                 <strong className="text-[#0f172a] font-semibold">
-                  Master what matters most:
+                  Academic Explanations &amp; Rationales:
                 </strong>{" "}
                 <span className="text-slate-600">
-                  Avero automatically prioritizes your knowledge gaps, so you make
-                  every minute count.
+                  Understand not just the correct answer, but the clinical reasoning required for council examinations.
                 </span>
               </div>
             </div>
@@ -139,20 +135,20 @@ export function Features() {
               </div>
               <div className="text-xs sm:text-base leading-snug">
                 <strong className="text-[#0f172a] font-semibold">
-                  Instant clinical rationale:
+                  Extracted Learning Points:
                 </strong>{" "}
                 <span className="text-slate-600">
-                  Understand the exact reason behind correct answers with instructor-backed explanations.
+                  Extract high-yield takeaways from every question so you know exactly what examiners expect you to master.
                 </span>
               </div>
             </div>
 
             {/* CTA Button */}
             <a
-              href="#get-started"
+              href="/signup"
               className="inline-flex items-center gap-2 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold text-sm sm:text-base px-6 sm:px-7 py-2.5 sm:py-3 rounded-full transition-all duration-200 shadow-sm"
             >
-              Try Avero Free
+              Try Avero Academy Free
               <ChevronRight className="w-4 h-4 stroke-[2.5]" />
             </a>
           </div>
@@ -163,7 +159,7 @@ export function Features() {
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm sm:max-w-md p-5 sm:p-6 text-center border border-slate-100">
               {/* Score header */}
               <div className="flex items-center justify-between text-xs font-semibold text-slate-500 mb-2">
-                <span>Progress</span>
+                <span>Pharmacology Council Review</span>
                 <span className="font-mono text-slate-700">40 of 40</span>
               </div>
 
@@ -172,30 +168,30 @@ export function Features() {
                 <div ref={progressBarRef} className="bg-emerald-500 h-full rounded-full"></div>
               </div>
               <div className="text-xs font-bold text-emerald-700 mb-4 sm:mb-5">
-                38 Correct · 2 Incorrect
+                38 Correct · 2 Incorrect (95% Mastery)
               </div>
 
               {/* Headline */}
               <h4 className="font-[family-name:var(--font-montserrat)] font-extrabold text-xl sm:text-2xl text-slate-900 mb-5">
-                Quiz complete!
+                Subject session complete!
               </h4>
 
               {/* Stats badges */}
               <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mb-5">
                 <div className="bg-emerald-50 border border-emerald-200/70 p-2.5 sm:p-3.5 rounded-xl text-center">
                   <div className="text-[10px] sm:text-[11px] font-bold text-emerald-700 uppercase tracking-wider mb-1">
-                    Correct
+                    Correct Rationale
                   </div>
                   <div className="text-lg sm:text-xl font-extrabold text-emerald-800">
                     95% <span className="text-xs font-medium text-emerald-600">(38)</span>
                   </div>
                 </div>
-                <div className="bg-rose-50 border border-rose-200/70 p-2.5 sm:p-3.5 rounded-xl text-center">
-                  <div className="text-[10px] sm:text-[11px] font-bold text-rose-700 uppercase tracking-wider mb-1">
-                    Incorrect
+                <div className="bg-amber-50 border border-amber-200/70 p-2.5 sm:p-3.5 rounded-xl text-center">
+                  <div className="text-[10px] sm:text-[11px] font-bold text-amber-700 uppercase tracking-wider mb-1">
+                    Learning Points
                   </div>
-                  <div className="text-lg sm:text-xl font-extrabold text-rose-800">
-                    5% <span className="text-xs font-medium text-rose-600">(2)</span>
+                  <div className="text-lg sm:text-xl font-extrabold text-amber-800">
+                    40 <span className="text-xs font-medium text-amber-600">Saved</span>
                   </div>
                 </div>
               </div>
@@ -204,11 +200,11 @@ export function Features() {
               <div className="flex flex-col gap-2">
                 <button className="w-full py-2.5 px-4 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors">
                   <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500" />
-                  Repeat missed
+                  Review missed concepts
                 </button>
                 <button className="w-full py-2.5 px-4 rounded-lg bg-[#2866e1] hover:bg-[#1d52bf] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors shadow-sm">
                   <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  New quiz
+                  Next subject (Anatomy)
                 </button>
               </div>
             </div>
@@ -220,13 +216,13 @@ export function Features() {
       <div ref={benefitCardsRef} className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-8">
         <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow">
           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#2866e1]/10 text-[#2866e1] flex items-center justify-center mb-4 sm:mb-5">
-            <Brain className="w-5 h-5 sm:w-6 sm:h-6" />
+            <BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <h4 className="font-[family-name:var(--font-montserrat)] font-bold text-base sm:text-lg text-[#0f172a] mb-2">
-            Active Recall & Practice
+            Subject-Categorized Past Papers
           </h4>
           <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-            Engage deeply with your course materials through targeted practice that strengthens long-term recall and reasoning.
+            Unmix scattered examination papers so you can focus and master one subject at a time before moving to the next.
           </p>
         </div>
 
@@ -235,10 +231,10 @@ export function Features() {
             <Target className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <h4 className="font-[family-name:var(--font-montserrat)] font-bold text-base sm:text-lg text-[#0f172a] mb-2">
-            Targeted Knowledge Gap Analysis
+            Extracted Key Learning Points
           </h4>
           <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-            Avero tracks your performance over time, automatically prioritizing missed concepts so you study efficiently.
+            Gain explicit insights into what council examiners test and expect you to retain for professional practice.
           </p>
         </div>
 
@@ -247,10 +243,10 @@ export function Features() {
             <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <h4 className="font-[family-name:var(--font-montserrat)] font-bold text-base sm:text-lg text-[#0f172a] mb-2">
-            Instructor Aligned Content
+            Verified Academic Accuracy
           </h4>
           <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-            Every question comes straight from your assigned course material, ensuring 100% relevance to your actual exams.
+            Every question, answer key, and explanation is rigorously verified to eliminate misleading or unsupported information.
           </p>
         </div>
       </div>

@@ -12,39 +12,34 @@ interface FAQItem {
 
 const faqs: FAQItem[] = [
   {
-    question: "What is Avero?",
+    question: "What is AVERO ACADEMY?",
     answer:
-      "Avero is a quiz platform that generates practice questions from your actual course material — so you're studying and testing yourself on what your professors taught, not a generic national question bank.",
+      "AVERO ACADEMY is an educational platform designed to help students prepare effectively for professional examinations, initially focusing on nursing students preparing for professional council examinations. We turn scattered past examination papers into an organized, subject-based, explanation-driven study system.",
   },
   {
-    question: "What subjects are available?",
+    question: "What nursing subjects are available?",
     answer:
-      "Whatever your school or program has added — Avero's library grows as your instructors upload more material. You'll see subjects and topics mapped to your actual coursework.",
+      "Avero Academy organizes questions into individual subject categories including Anatomy, Fundamentals of Nursing, Pharmacology, Medical-Surgical Nursing, Maternal & Child Health, and other core nursing courses.",
+  },
+  {
+    question: "How does Avero Academy organize past questions?",
+    answer:
+      "Rather than making students dig through mixed exam papers, Avero Academy identifies and groups questions into their respective subjects. This enables structured, subject-by-subject practice so you master one domain at a time.",
+  },
+  {
+    question: "What are extracted learning points?",
+    answer:
+      "Beyond providing verified correct answers, Avero Academy extracts key learning points and insights for every question. This ensures you understand both the clinical reasoning behind the answer and what examiners expect you to know.",
   },
   {
     question: "Is there a free version?",
     answer:
-      "Yes. The Free plan includes one quiz a day so you can try Avero before upgrading for unlimited practice.",
+      "Yes. The Free Starter plan gives you daily access to categorized nursing council practice sets so you can experience Avero Academy's explanation-driven system before upgrading.",
   },
   {
-    question: "Can I use Avero on my phone?",
+    question: "How is answer accuracy maintained?",
     answer:
-      "Yes — it's built to work well on mobile, so you can quiz yourself between lectures or on rounds.",
-  },
-  {
-    question: "How is my progress tracked?",
-    answer:
-      "Avero tracks your scores over time and flags the topics you consistently miss, so you know what to revisit before an exam.",
-  },
-  {
-    question: "Is Avero affiliated with USMLE, NBME, or my school?",
-    answer:
-      "No — Avero is an independent study tool. It's built to reflect your own course content, not to replicate any official exam board's material.",
-  },
-  {
-    question: "How is pricing structured?",
-    answer:
-      "Free for individual students with limited daily quizzes, a paid Student plan for unlimited access, and a custom School plan for institutions that includes admin tools and analytics.",
+      "All question keys, explanations, and learning points undergo rigorous academic review by nursing educators to ensure 100% accuracy and eliminate misleading or unsupported information.",
   },
 ];
 
@@ -95,7 +90,7 @@ export function FAQ() {
             Frequently asked questions
           </h2>
           <p className="text-slate-600 text-sm sm:text-lg font-normal">
-            Everything you need to know about studying with Avero.
+            Everything you need to know about preparing for council exams with Avero Academy.
           </p>
         </div>
 

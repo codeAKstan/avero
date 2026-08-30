@@ -47,10 +47,10 @@ export function Footer() {
         >
           <div className="max-w-xl z-10">
             <h2 className="font-[family-name:var(--font-montserrat)] font-bold text-2xl sm:text-4xl lg:text-5xl text-white tracking-tight mb-3 sm:mb-4">
-              Ready to transform the way you study?
+              Ready to master your nursing council exams?
             </h2>
             <p className="text-white/80 text-sm sm:text-lg font-normal">
-              Join 10,000+ medical and nursing students acing their exams with Avero.
+              Join thousands of nursing candidates preparing smarter with Avero Academy.
             </p>
           </div>
 
@@ -83,7 +83,7 @@ export function Footer() {
               />
             </Link>
             <p className="text-slate-400 text-xs sm:text-sm leading-relaxed max-w-sm mb-4 sm:mb-6">
-              Study smarter. Get tested on what actually matters. Avero helps medical students and healthcare professionals master course material with active recall.
+              AVERO ACADEMY turns scattered professional examination past questions into an organized, subject-based, explanation-driven study system that helps students prepare smarter and more confidently.
             </p>
           </div>
 
@@ -125,9 +125,9 @@ export function Footer() {
               </div>
               <ul className="space-y-2.5 sm:space-y-3">
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <Link href="/about" className="hover:text-white transition-colors">
                     About Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <Link href="/for-educators" className="hover:text-white transition-colors">
@@ -181,7 +181,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 text-center sm:text-left">
           <div>
-            &copy; {new Date().getFullYear()} Avero Technologies Inc. All rights reserved.
+            &copy; {new Date().getFullYear()} AVERO ACADEMY Technologies Inc. All rights reserved.
           </div>
           <div className="flex items-center gap-6">
             <a href="#" className="hover:text-slate-400 transition-colors">

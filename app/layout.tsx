@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Montserrat } from "next/font/google";
+import { Montserrat, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -15,13 +10,14 @@ const geistMono = Geist_Mono({
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Avero - Study smarter. Get tested on what actually matters.",
+  title: "AVERO ACADEMY - Nursing Council Exam Prep & Question Bank",
   description:
-    "Upload your lecture slides, notes, or textbook chapters. Avero turns them into exam-style quizzes reviewed by your instructors.",
+    "AVERO ACADEMY turns scattered professional examination past questions into an organized, subject-based, explanation-driven study system.",
   icons: {
     icon: "/images/favicon.png",
     shortcut: "/images/favicon.png",
@@ -37,9 +33,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} h-full antialiased`}
+      className={`${montserrat.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#f5f8ff] bg-dot-pattern text-[#0f172a]">
+      <body className="min-h-full flex flex-col bg-[#f5f8ff] bg-dot-pattern text-[#0f172a] font-[family-name:var(--font-montserrat)]">
         {children}
       </body>
     </html>

@@ -44,10 +44,10 @@ export function HowItWorks() {
           Simple 3-Step Process
         </div>
         <h2 className="font-[family-name:var(--font-montserrat)] font-bold text-2xl sm:text-4xl md:text-[44px] leading-tight text-[#0f172a] tracking-tight mb-3 sm:mb-4">
-          How Avero works in 3 simple steps
+          How Avero Academy works in 3 simple steps
         </h2>
         <p className="text-slate-600 text-sm sm:text-base md:text-lg font-normal max-w-2xl mx-auto leading-relaxed">
-          No question banks to dig through, no guessing what&apos;s relevant. Just pick a subject and start testing yourself.
+          No more digging through scattered past papers. Just pick a subject and start studying structured council questions with clear rationales.
         </p>
       </div>
 
@@ -65,14 +65,14 @@ export function HowItWorks() {
               </span>
             </div>
             <h3 className="font-[family-name:var(--font-montserrat)] font-bold text-lg sm:text-xl text-[#0f172a] mb-2 sm:mb-3">
-              Pick a subject or topic
+              Pick a nursing subject
             </h3>
             <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6">
-              Browse by subject, system, or chapter — mapped to what your course actually covers.
+              Browse Anatomy, Fundamentals of Nursing, Pharmacology, or Medical-Surgical Nursing — separated cleanly from mixed exam papers.
             </p>
           </div>
           <div className="text-xs font-semibold text-[#2866e1] flex items-center gap-1">
-            <span>Mapped to Your Syllabus</span>
+            <span>Subject-Based Categorization</span>
           </div>
         </div>
 
@@ -88,14 +88,14 @@ export function HowItWorks() {
               </span>
             </div>
             <h3 className="font-[family-name:var(--font-montserrat)] font-bold text-lg sm:text-xl text-[#0f172a] mb-2 sm:mb-3">
-              Take the quiz
+              Practice council questions
             </h3>
             <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6">
-              Every question is generated from your school&apos;s real course material and checked by instructors before it reaches you.
+              Practice real past professional council examination questions with verified correct answers and zero misleading information.
             </p>
           </div>
           <div className="text-xs font-semibold text-[#2866e1] flex items-center gap-1">
-            <span>Instructor Verified</span>
+            <span>Verified Answer Accuracy</span>
           </div>
         </div>
 
@@ -111,14 +111,14 @@ export function HowItWorks() {
               </span>
             </div>
             <h3 className="font-[family-name:var(--font-montserrat)] font-bold text-lg sm:text-xl text-[#0f172a] mb-2 sm:mb-3">
-              See where you stand
+              Master rationales &amp; key points
             </h3>
             <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6">
-              Get an instant explanation for every answer, and track which topics you need to revisit before the exam.
+              Read clear academic rationales and extracted learning points so you understand what examiners expect you to know.
             </p>
           </div>
           <div className="text-xs font-semibold text-[#2866e1] flex items-center gap-1">
-            <span>Instant Feedback & Analytics</span>
+            <span>Extracted Learning Guidance</span>
           </div>
         </div>
       </div>

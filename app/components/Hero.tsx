@@ -91,7 +91,7 @@ export function Hero() {
             className="inline-flex items-center gap-2 bg-[#e8f0fe] text-[#2866e1] text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase px-3.5 sm:px-4 py-1.5 rounded-full border border-[#cbdcfd] mb-5 sm:mb-7"
           >
             <span className="w-2 h-2 rounded-full bg-[#2866e1] animate-pulse"></span>
-            Question Bank for every Nurse, everywhere
+            Avero Academy · Nursing Council Exam Prep
           </div>
 
           {/* Main Headline */}
@@ -99,13 +99,13 @@ export function Hero() {
             ref={titleRef}
             className="font-[family-name:var(--font-montserrat)] font-bold text-[32px] xs:text-[36px] sm:text-[48px] lg:text-[54px] leading-[1.12] sm:leading-[1.15] text-[#0f172a] tracking-tight mb-5 sm:mb-6"
           >
-            Study smarter.
+            Master nursing
             <br />
-            Get tested on what
+            council exams,
             <br />
-            actually{" "}
+            subject by{" "}
             <span className="relative inline-block text-[#0f172a]">
-              matters
+              subject
               <svg
                 className="absolute -bottom-1.5 sm:-bottom-2 left-0 w-full overflow-visible"
                 viewBox="0 0 150 14"
@@ -129,7 +129,7 @@ export function Hero() {
             ref={descRef}
             className="text-slate-600 text-sm sm:text-base md:text-[17px] leading-relaxed max-w-lg mb-8 sm:mb-10"
           >
-            Pick a subject, and get tested with quizzes built from your actual course material . No digging through generic national question banks that don&apos;t match what you were taught.
+            AVERO ACADEMY turns scattered professional examination past questions into an organized, subject-based, explanation-driven study system so nursing students prepare smarter and pass with confidence.
           </p>
 
           {/* Action Buttons */}
@@ -141,18 +141,18 @@ export function Hero() {
               href="/signup"
               className="w-full sm:w-auto justify-center bg-[#2866e1] hover:bg-[#1d52bf] text-white font-medium text-base px-6 py-3.5 rounded-full transition-all flex items-center gap-3 shadow-md shadow-[#2866e1]/20 group"
             >
-              <span>Get Started</span>
+              <span>Get Started Free</span>
               <span className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center transition-transform group-hover:translate-x-0.5">
                 <ChevronRight className="w-4 h-4 text-white stroke-[3]" />
               </span>
             </Link>
-            <a
-              href="#how-it-works"
+            <Link
+              href="/how-it-works"
               className="w-full sm:w-auto justify-center inline-flex items-center gap-1.5 text-[#0f172a] font-semibold text-base hover:opacity-80 transition-opacity py-2 sm:py-0"
             >
               See how it works
               <ChevronRight className="w-4 h-4 text-[#0f172a] stroke-[2.5]" />
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -165,7 +165,7 @@ export function Hero() {
           <div ref={graphicRef} className="relative w-full max-w-[540px]">
             <Image
               src="/images/hero-image.PNG"
-              alt="Avero exam quiz generator preview"
+              alt="Avero Academy exam prep preview"
               width={640}
               height={520}
               priority
