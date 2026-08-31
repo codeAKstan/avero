@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/User";
 import { signUserToken, USER_COOKIE_NAME } from "@/lib/userAuth";
@@ -6,7 +7,7 @@ import { signUserToken, USER_COOKIE_NAME } from "@/lib/userAuth";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email } = body;
+    const { email, password } = body;
 
     if (!email) {
       return NextResponse.json(
@@ -17,19 +18,32 @@ export async function POST(request: Request) {
 
     await connectToDatabase();
     const normalizedEmail = email.toLowerCase().trim();
-    let user = await User.findOne({ email: normalizedEmail });
+    let user = await User.findOne({ email: normalizedEmail }).select("+passwordHash");
 
     if (!user) {
-      // Auto-register user if logging in for the first time
-      const nameFromEmail = email.split("@")[0].replace(".", " ");
-      const capitalizedName = nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
+      return NextResponse.json(
+        { error: "No account found with this email. Please sign up first." },
+        { status: 404 }
+      );
+    }
 
-      user = await User.create({
-        fullName: capitalizedName,
-        email: normalizedEmail,
-        role: "student",
-        isOnboarded: false,
-      });
+    if (user.passwordHash) {
+      if (!password) {
+        return NextResponse.json(
+          { error: "Password is required for this account." },
+          { status: 400 }
+        );
+      }
+      const isMatch = await bcrypt.compare(password, user.passwordHash);
+      if (!isMatch) {
+        return NextResponse.json(
+          { error: "Invalid email or password. Please try again." },
+          { status: 401 }
+        );
+      }
+    } else if (password && password.trim().length > 0) {
+      user.passwordHash = await bcrypt.hash(password, 10);
+      await user.save();
     }
 
     const token = signUserToken({

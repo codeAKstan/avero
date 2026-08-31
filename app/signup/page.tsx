@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   GraduationCap,
   School,
@@ -21,6 +22,7 @@ import {
 import gsap from "gsap";
 
 export default function SignupPage() {
+  const router = useRouter();
   // Form step state: 1 = Account Info, 2 = Onboarding ("Tell us about you"), 3 = Welcome Email & Success
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
@@ -104,12 +106,13 @@ export default function SignupPage() {
 
     try {
       // Trigger API Route to process registration & generate welcome email
-      const res = await fetch("/api/signup", {
+      await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fullName,
           email,
+          password,
           role,
           studentType,
           university,
@@ -117,28 +120,10 @@ export default function SignupPage() {
         }),
       });
 
-      const data = await res.json();
-      if (res.ok && data.emailSent) {
-        setEmailData(data.emailSent);
-      } else {
-        // Fallback email preview
-        setEmailData({
-          to: email,
-          subject: "Welcome to AVERO ACADEMY - Your Account is Ready!",
-          sentAt: new Date().toISOString(),
-          content: `Dear ${fullName},\n\nWelcome to AVERO ACADEMY! Your account has been initialized for ${studentType} at ${university}.\n\nYou can now access subject-categorized nursing council exam past questions.`,
-        });
-      }
-      setStep(3);
+      router.push("/dashboard");
     } catch (err) {
-      // Fallback transition
-      setEmailData({
-        to: email,
-        subject: "Welcome to AVERO ACADEMY - Your Account is Ready!",
-        sentAt: new Date().toISOString(),
-        content: `Dear ${fullName},\n\nWelcome to AVERO ACADEMY! Your account is active for ${studentType} (${university}, ${gradYear}).`,
-      });
-      setStep(3);
+      console.error("Signup error:", err);
+      router.push("/dashboard");
     } finally {
       setIsSubmitting(false);
     }

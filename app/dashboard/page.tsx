@@ -16,6 +16,10 @@ import {
   BarChart2,
   PlayCircle,
   FileText,
+  Brain,
+  Bookmark,
+  Calendar,
+  Flame,
 } from "lucide-react";
 
 interface IStats {
@@ -32,18 +36,24 @@ export default function StudentDashboardPage() {
   const [recommendedCourses, setRecommendedCourses] = useState<any[]>([]);
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
+  const [flashcardsDueCount, setFlashcardsDueCount] = useState<number>(0);
+  const [scheduleData, setScheduleData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      const [statsRes, userRes] = await Promise.all([
+      const [statsRes, userRes, flashcardsRes, scheduleRes] = await Promise.all([
         fetch("/api/user/stats"),
         fetch("/api/user/me"),
+        fetch("/api/user/flashcards?mode=due"),
+        fetch("/api/user/schedule"),
       ]);
 
       const statsData = await statsRes.json();
       const userData = await userRes.json();
+      const flashcardsData = await flashcardsRes.json();
+      const schedData = await scheduleRes.json();
 
       if (userData.success) {
         setUser(userData.user);
@@ -54,6 +64,14 @@ export default function StudentDashboardPage() {
         setRecentAttempts(statsData.recentAttempts || []);
         setRecommendedCourses(statsData.recommendedCourses || []);
         setAnnouncements(statsData.announcements || []);
+      }
+
+      if (flashcardsData.success) {
+        setFlashcardsDueCount(flashcardsData.dueCount || 0);
+      }
+
+      if (schedData.success) {
+        setScheduleData(schedData.schedule);
       }
     } catch (err) {
       console.error("Error loading student dashboard data", err);
@@ -198,6 +216,88 @@ export default function StudentDashboardPage() {
           <div className="mt-2 text-xs text-slate-500 font-medium">
             Total active practice time
           </div>
+        </div>
+      </div>
+
+      {/* Active Learning & Spaced Repetition Habits Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* Widget 1: SM-2 Spaced Repetition Flashcards */}
+        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-6 shadow-md flex flex-col justify-between relative overflow-hidden">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Brain className="w-5 h-5 text-[#2866e1]" />
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                Spaced Repetition Deck
+              </span>
+            </div>
+            <span className="px-2.5 py-0.5 rounded-full bg-[#2866e1]/30 text-[#60a5fa] font-mono text-[10px] font-bold border border-[#2866e1]/40">
+              SM-2 Engine
+            </span>
+          </div>
+
+          <div className="space-y-1 mb-4">
+            <div className="text-3xl font-black text-white">
+              {flashcardsDueCount} <span className="text-sm font-semibold text-slate-400">Cards Due Today</span>
+            </div>
+            <p className="text-xs text-slate-400">
+              {flashcardsDueCount > 0
+                ? "Review past question rationales before memory decay occurs."
+                : "All flashcards completed for today! Retest to reinforce memory."}
+            </p>
+          </div>
+
+          <Link
+            href="/dashboard/flashcards"
+            className="w-full py-2.5 px-4 bg-[#2866e1] hover:bg-[#1d52bf] text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 transition text-center"
+          >
+            <Brain className="w-4 h-4" /> Start Flashcard Review Session
+          </Link>
+        </div>
+
+        {/* Widget 2: Daily Study Goal & Streak */}
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Flame className="w-5 h-5 text-amber-500" />
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                Daily Goal & Streak
+              </span>
+            </div>
+            <span className="text-xs font-black text-amber-600 flex items-center gap-1 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+              🔥 {scheduleData?.currentStreakDays || 0} Day Streak
+            </span>
+          </div>
+
+          <div className="space-y-2 mb-3">
+            <div className="flex justify-between items-baseline text-xs">
+              <span className="font-bold text-slate-700">Questions Today</span>
+              <span className="font-extrabold text-[#2866e1]">
+                {scheduleData?.questionsCompletedToday || 0} / {scheduleData?.dailyQuestionGoal || 20}
+              </span>
+            </div>
+            <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200/60">
+              <div
+                className="bg-[#2866e1] h-full transition-all duration-300"
+                style={{
+                  width: `${Math.min(
+                    100,
+                    Math.round(
+                      ((scheduleData?.questionsCompletedToday || 0) /
+                        (scheduleData?.dailyQuestionGoal || 20)) *
+                        100
+                    )
+                  )}%`,
+                }}
+              />
+            </div>
+          </div>
+
+          <Link
+            href="/dashboard/schedule"
+            className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition text-center"
+          >
+            <Calendar className="w-4 h-4 text-[#2866e1]" /> View Study Planner & Habits
+          </Link>
         </div>
       </div>
 

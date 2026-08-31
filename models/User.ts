@@ -5,9 +5,17 @@ export interface IUser extends Document {
   email: string;
   role: "student" | "educator" | "admin";
   passwordHash?: string;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
   studentType?: string;
   university?: string;
   gradYear?: string;
+  dailyQuestionGoal?: number;
+  dailyStudyTimeMinutes?: number;
+  preferredStudyTime?: string;
+  emailRemindersEnabled?: boolean;
+  currentStreakDays?: number;
+  lastStudyDate?: Date;
   isOnboarded: boolean;
   isSuspended?: boolean;
   createdAt: Date;
@@ -37,6 +45,14 @@ const UserSchema: Schema<IUser> = new Schema(
       type: String,
       select: false,
     },
+    resetPasswordToken: {
+      type: String,
+      select: false,
+    },
+    resetPasswordExpires: {
+      type: Date,
+      select: false,
+    },
     studentType: {
       type: String,
       trim: true,
@@ -48,6 +64,29 @@ const UserSchema: Schema<IUser> = new Schema(
     gradYear: {
       type: String,
       trim: true,
+    },
+    dailyQuestionGoal: {
+      type: Number,
+      default: 20,
+    },
+    dailyStudyTimeMinutes: {
+      type: Number,
+      default: 30,
+    },
+    preferredStudyTime: {
+      type: String,
+      default: "20:00",
+    },
+    emailRemindersEnabled: {
+      type: Boolean,
+      default: true,
+    },
+    currentStreakDays: {
+      type: Number,
+      default: 0,
+    },
+    lastStudyDate: {
+      type: Date,
     },
     isOnboarded: {
       type: Boolean,
@@ -62,6 +101,10 @@ const UserSchema: Schema<IUser> = new Schema(
     timestamps: true,
   }
 );
+
+if (mongoose.models && mongoose.models.User) {
+  delete mongoose.models.User;
+}
 
 const User: Model<IUser> =
   mongoose.models.User || mongoose.model<IUser>("User", UserSchema);

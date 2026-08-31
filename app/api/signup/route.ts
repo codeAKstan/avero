@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/User";
 import { sendWelcomeEmail } from "@/lib/email";
@@ -7,7 +8,7 @@ import { signUserToken, USER_COOKIE_NAME } from "@/lib/userAuth";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { fullName, email, role, studentType, university, gradYear } = body;
+    const { fullName, email, password, role, studentType, university, gradYear } = body;
 
     if (!fullName || !email) {
       return NextResponse.json(
@@ -23,6 +24,11 @@ export async function POST(request: Request) {
     const normalizedEmail = email.toLowerCase().trim();
     let user = await User.findOne({ email: normalizedEmail });
 
+    let hashedPassword = "";
+    if (password && password.trim().length > 0) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+
     if (user) {
       // Update existing user's onboarding info
       user.fullName = fullName;
@@ -30,6 +36,7 @@ export async function POST(request: Request) {
       if (studentType) user.studentType = studentType;
       if (university) user.university = university;
       if (gradYear) user.gradYear = gradYear;
+      if (hashedPassword) user.passwordHash = hashedPassword;
       user.isOnboarded = true;
       await user.save();
     } else {
@@ -37,6 +44,7 @@ export async function POST(request: Request) {
       user = await User.create({
         fullName,
         email: normalizedEmail,
+        passwordHash: hashedPassword || undefined,
         role: role || "student",
         studentType,
         university,

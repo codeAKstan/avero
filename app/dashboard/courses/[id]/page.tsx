@@ -29,6 +29,7 @@ export default function StudentCourseDetailPage({
   const [previousAttempts, setPreviousAttempts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMode, setSelectedMode] = useState<"Practice" | "Exam">("Practice");
+  const [questionCount, setQuestionCount] = useState<number>(0);
 
   useEffect(() => {
     fetch(`/api/user/courses/${id}`)
@@ -37,6 +38,8 @@ export default function StudentCourseDetailPage({
         if (data.success) {
           setCourse(data.course);
           setPreviousAttempts(data.previousAttempts || []);
+          const totalQ = data.course?.questions?.length || 0;
+          setQuestionCount(totalQ);
         }
       })
       .catch((err) => console.error("Error fetching course detail:", err))
@@ -44,7 +47,9 @@ export default function StudentCourseDetailPage({
   }, [id]);
 
   const handleStartSession = () => {
-    router.push(`/dashboard/courses/${id}/take?mode=${selectedMode}`);
+    const totalQ = course?.questions?.length || 1;
+    const finalCount = Math.max(1, Math.min(questionCount || totalQ, totalQ));
+    router.push(`/dashboard/courses/${id}/take?mode=${selectedMode}&count=${finalCount}`);
   };
 
   if (loading) {
@@ -208,12 +213,75 @@ export default function StudentCourseDetailPage({
           </div>
         </div>
 
+        {/* Question Count Selection */}
+        <div className="pt-2 border-t border-slate-100 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">Number of Questions</h3>
+              <p className="text-xs text-slate-500">Select how many questions you want to take in this session</p>
+            </div>
+            <span className="px-3 py-1 bg-slate-100 text-slate-800 rounded-lg text-xs font-bold font-mono">
+              {questionCount} / {course.questions?.length || 0} Questions
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {[5, 10, 20, 50, 100].map((preset) => {
+              const maxQ = course.questions?.length || 0;
+              if (preset > maxQ) return null;
+              return (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => setQuestionCount(preset)}
+                  className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+                    questionCount === preset
+                      ? "bg-[#2866e1] text-white shadow-xs"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  }`}
+                >
+                  {preset} Qs
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              onClick={() => setQuestionCount(course.questions?.length || 0)}
+              className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+                questionCount === (course.questions?.length || 0)
+                  ? "bg-[#2866e1] text-white shadow-xs"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              }`}
+            >
+              All ({course.questions?.length || 0})
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3 pt-1">
+            <span className="text-xs font-semibold text-slate-500">Custom count:</span>
+            <input
+              type="number"
+              min={1}
+              max={course.questions?.length || 1}
+              value={questionCount || ""}
+              onChange={(e) => {
+                const val = parseInt(e.target.value, 10);
+                const maxQ = course.questions?.length || 1;
+                if (isNaN(val)) setQuestionCount(0);
+                else setQuestionCount(Math.max(1, Math.min(val, maxQ)));
+              }}
+              className="w-24 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2866e1]/30 focus:border-[#2866e1]"
+            />
+            <span className="text-xs text-slate-400 font-medium">max: {course.questions?.length || 0}</span>
+          </div>
+        </div>
+
         <button
           onClick={handleStartSession}
           className="w-full py-3.5 px-6 rounded-xl bg-[#2866e1] hover:bg-[#1d52bf] text-white font-bold text-sm flex items-center justify-center gap-2 transition shadow-md cursor-pointer"
         >
           <PlayCircle className="w-5 h-5" />
-          <span>Launch {selectedMode} Session</span>
+          <span>Launch {selectedMode} Session ({questionCount} Questions)</span>
         </button>
       </div>
 

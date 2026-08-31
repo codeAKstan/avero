@@ -12,6 +12,7 @@ import {
   Loader2,
   HelpCircle,
   Sparkles,
+  Bookmark,
 } from "lucide-react";
 
 export default function StudentAttemptDetailReviewPage({
@@ -23,7 +24,30 @@ export default function StudentAttemptDetailReviewPage({
 
   const [attempt, setAttempt] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [bookmarked, setBookmarked] = useState<{ [key: number]: boolean }>({});
   const [filterView, setFilterView] = useState<"All" | "Incorrect" | "Correct">("All");
+
+  const toggleBookmark = async (ans: any, index: number) => {
+    if (!attempt) return;
+    const newBookmarkedState = !bookmarked[index];
+    setBookmarked((prev) => ({ ...prev, [index]: newBookmarkedState }));
+
+    try {
+      await fetch("/api/user/bookmarks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          courseId: attempt.courseId?._id || attempt.courseId,
+          questionId: ans.questionId || `q_${index}`,
+          questionText: ans.questionText,
+          correctAnswer: ans.correctChoice,
+          explanation: ans.explanation || "",
+        }),
+      });
+    } catch (err) {
+      console.error("Error toggling bookmark:", err);
+    }
+  };
 
   useEffect(() => {
     fetch(`/api/user/attempts/${id}`)
@@ -206,23 +230,37 @@ export default function StudentAttemptDetailReviewPage({
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                 Question {idx + 1}
               </span>
-              <span
-                className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 ${
-                  ans.isCorrect
-                    ? "bg-emerald-100 text-emerald-800"
-                    : "bg-rose-100 text-rose-800"
-                }`}
-              >
-                {ans.isCorrect ? (
-                  <>
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Correct Answer
-                  </>
-                ) : (
-                  <>
-                    <XCircle className="w-3.5 h-3.5 text-rose-600" /> Incorrect Choice
-                  </>
-                )}
-              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toggleBookmark(ans, idx)}
+                  className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full transition cursor-pointer ${
+                    bookmarked[idx]
+                      ? "bg-[#2866e1]/15 text-[#2866e1] border border-[#2866e1]/30 font-bold"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  <Bookmark className="w-3 h-3" />
+                  <span className="text-[10px]">{bookmarked[idx] ? "Saved" : "Save"}</span>
+                </button>
+
+                <span
+                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 ${
+                    ans.isCorrect
+                      ? "bg-emerald-100 text-emerald-800"
+                      : "bg-rose-100 text-rose-800"
+                  }`}
+                >
+                  {ans.isCorrect ? (
+                    <>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Correct Answer
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="w-3.5 h-3.5 text-rose-600" /> Incorrect Choice
+                    </>
+                  )}
+                </span>
+              </div>
             </div>
 
             <h3 className="font-extrabold text-slate-900 text-sm md:text-base leading-snug">

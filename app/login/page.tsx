@@ -39,7 +39,7 @@ export default function LoginPage() {
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
@@ -152,12 +152,12 @@ export default function LoginPage() {
               <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 uppercase tracking-wider">
                 Password
               </label>
-              <a
-                href="#forgot"
+              <Link
+                href="/forgot-password"
                 className="text-[11px] sm:text-xs font-semibold text-[#2866e1] hover:underline"
               >
                 Forgot password?
-              </a>
+              </Link>
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">

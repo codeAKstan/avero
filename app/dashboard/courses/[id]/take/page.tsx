@@ -16,6 +16,7 @@ import {
   BookOpen,
   Sparkles,
   AlertTriangle,
+  Bookmark,
 } from "lucide-react";
 
 export default function StudentExamRunnerPage({
@@ -27,12 +28,14 @@ export default function StudentExamRunnerPage({
   const router = useRouter();
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode") === "Exam" ? "Exam" : "Practice";
+  const countParam = searchParams.get("count");
 
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({});
   const [flagged, setFlagged] = useState<{ [key: number]: boolean }>({});
+  const [bookmarked, setBookmarked] = useState<{ [key: number]: boolean }>({});
   const [submitting, setSubmitting] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
 
@@ -40,19 +43,62 @@ export default function StudentExamRunnerPage({
   const [secondsRemaining, setSecondsRemaining] = useState<number>(0);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
 
+  const toggleBookmark = async (index: number) => {
+    if (!course || !course.questions || !course.questions[index]) return;
+    const q = course.questions[index];
+    const newBookmarkedState = !bookmarked[index];
+
+    setBookmarked((prev) => ({ ...prev, [index]: newBookmarkedState }));
+
+    try {
+      await fetch("/api/user/bookmarks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          courseId: course._id,
+          questionId: q._id || `q_${index}`,
+          questionText: q.question,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+          explanation: q.explanation || "",
+        }),
+      });
+    } catch (err) {
+      console.error("Error toggling bookmark:", err);
+    }
+  };
+
   useEffect(() => {
     fetch(`/api/user/courses/${id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success && data.course) {
-          setCourse(data.course);
-          const limitSeconds = (data.course.timeLimitMinutes || 60) * 60;
-          setSecondsRemaining(limitSeconds);
+          let loadedCourse = data.course;
+          const totalAvailable = loadedCourse.questions?.length || 0;
+          let reqCount = countParam ? parseInt(countParam, 10) : totalAvailable;
+          if (isNaN(reqCount) || reqCount <= 0) reqCount = totalAvailable;
+
+          if (reqCount < totalAvailable) {
+            loadedCourse = {
+              ...loadedCourse,
+              questions: loadedCourse.questions.slice(0, reqCount),
+            };
+          }
+
+          setCourse(loadedCourse);
+
+          const fullLimitMinutes = data.course.timeLimitMinutes || 60;
+          const scaledMinutes =
+            totalAvailable > 0
+              ? Math.max(1, Math.round((reqCount / totalAvailable) * fullLimitMinutes))
+              : fullLimitMinutes;
+
+          setSecondsRemaining(scaledMinutes * 60);
         }
       })
       .catch((err) => console.error("Error loading exam questions:", err))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, countParam]);
 
   // Timer interval countdown
   useEffect(() => {
@@ -231,17 +277,31 @@ export default function StudentExamRunnerPage({
             <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
               Question {currentIndex + 1}
             </span>
-            <button
-              onClick={() => toggleFlag(currentIndex)}
-              className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-lg transition cursor-pointer ${
-                flagged[currentIndex]
-                  ? "bg-amber-100 text-amber-800 border border-amber-300"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              <Flag className="w-3.5 h-3.5" />
-              <span>{flagged[currentIndex] ? "Flagged" : "Flag for review"}</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => toggleBookmark(currentIndex)}
+                className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-lg transition cursor-pointer ${
+                  bookmarked[currentIndex]
+                    ? "bg-[#2866e1]/15 text-[#2866e1] border border-[#2866e1]/30 font-bold"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                <Bookmark className="w-3.5 h-3.5" />
+                <span>{bookmarked[currentIndex] ? "Saved" : "Save Question"}</span>
+              </button>
+
+              <button
+                onClick={() => toggleFlag(currentIndex)}
+                className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-lg transition cursor-pointer ${
+                  flagged[currentIndex]
+                    ? "bg-amber-100 text-amber-800 border border-amber-300"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                <Flag className="w-3.5 h-3.5" />
+                <span>{flagged[currentIndex] ? "Flagged" : "Flag for review"}</span>
+              </button>
+            </div>
           </div>
 
           {/* Question Text */}

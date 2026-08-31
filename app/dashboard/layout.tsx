@@ -16,6 +16,9 @@ import {
   ChevronRight,
   Sparkles,
   UserCheck,
+  Brain,
+  Bookmark,
+  Calendar,
 } from "lucide-react";
 
 export default function StudentDashboardLayout({
@@ -57,6 +60,9 @@ export default function StudentDashboardLayout({
   const navItems = [
     { label: "Dashboard Overview", href: "/dashboard", icon: LayoutDashboard },
     { label: "Courses & Test Banks", href: "/dashboard/courses", icon: BookOpen },
+    { label: "Active Flashcards (SM-2)", href: "/dashboard/flashcards", icon: Brain },
+    { label: "Saved Questions", href: "/dashboard/bookmarks", icon: Bookmark },
+    { label: "Study Schedule Planner", href: "/dashboard/schedule", icon: Calendar },
     { label: "Exam Attempts & History", href: "/dashboard/attempts", icon: History },
     { label: "Study Analytics", href: "/dashboard/analytics", icon: BarChart2 },
     { label: "Profile & Settings", href: "/dashboard/settings", icon: Settings },
