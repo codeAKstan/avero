@@ -14,7 +14,7 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://avero.academy";
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.avero.academy";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -79,6 +79,9 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: siteUrl,
+  },
+  verification: {
+    google: "google47a27e122c2abd79",
   },
 };
 
