@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -70,9 +71,14 @@ export default function AdminLayout({
       {/* Mobile Top Header */}
       <div className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200/80 shadow-xs shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-[#2866e1] flex items-center justify-center text-white font-bold text-sm shadow-sm">
-            A
-          </div>
+          <Image
+            src="/images/favicon.png"
+            alt="Avero Logo"
+            width={32}
+            height={32}
+            className="w-8 h-8 object-contain"
+            priority
+          />
           <span className="font-bold text-slate-900 text-base tracking-tight">AVERO ADMIN</span>
         </div>
         <button
@@ -91,9 +97,14 @@ export default function AdminLayout({
         {/* Brand Section */}
         <div className="p-6 border-b border-slate-100 flex items-center justify-between shrink-0">
           <Link href="/admin" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-[#2866e1] flex items-center justify-center text-white font-bold shadow-md shadow-[#2866e1]/20 group-hover:scale-105 transition-transform">
-              A
-            </div>
+            <Image
+              src="/images/favicon.png"
+              alt="Avero Logo"
+              width={40}
+              height={40}
+              className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
+              priority
+            />
             <div>
               <h2 className="font-extrabold text-slate-900 text-sm tracking-tight leading-tight group-hover:text-[#2866e1] transition-colors">
                 AVERO ACADEMY
