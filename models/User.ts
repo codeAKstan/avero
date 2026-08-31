@@ -16,6 +16,7 @@ export interface IUser extends Document {
   emailRemindersEnabled?: boolean;
   currentStreakDays?: number;
   lastStudyDate?: Date;
+  lastReminderSentDate?: Date;
   isOnboarded: boolean;
   isSuspended?: boolean;
   createdAt: Date;
@@ -86,6 +87,9 @@ const UserSchema: Schema<IUser> = new Schema(
       default: 0,
     },
     lastStudyDate: {
+      type: Date,
+    },
+    lastReminderSentDate: {
       type: Date,
     },
     isOnboarded: {
