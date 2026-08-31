@@ -4,6 +4,7 @@ import { getUserFromSession } from "@/lib/userAuth";
 import ExamAttempt from "@/models/ExamAttempt";
 import Announcement from "@/models/Announcement";
 import Course from "@/models/Course";
+import Category from "@/models/Category";
 
 export async function GET() {
   try {

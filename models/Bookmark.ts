@@ -1,4 +1,6 @@
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
+import "./User";
+import "./Course";
 
 export interface IBookmark extends Document {
   userId: Types.ObjectId;

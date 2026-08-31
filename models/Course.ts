@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
+import "./Category";
 
 export interface ICourseModule {
   _id?: Types.ObjectId;

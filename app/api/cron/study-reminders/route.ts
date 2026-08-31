@@ -16,11 +16,20 @@ export async function GET(request: Request) {
 
     await connectToDatabase();
 
-    // Get current time string in HH:MM format (24-hour)
+    // Get current time strings in both 24h (HH:MM) and 12h (hh:mm AM/PM) formats
     const now = new Date();
-    const currentHours = now.getHours().toString().padStart(2, "0");
-    const currentMinutes = now.getMinutes().toString().padStart(2, "0");
-    const currentTimeStr = `${currentHours}:${currentMinutes}`; // e.g. "20:00"
+    const currentHours24 = now.getHours();
+    const currentMinutes = now.getMinutes();
+    const currentMinutesStr = currentMinutes.toString().padStart(2, "0");
+
+    const currentHours24Str = currentHours24.toString().padStart(2, "0");
+    const currentTime24 = `${currentHours24Str}:${currentMinutesStr}`; // e.g. "16:40"
+
+    const hours12 = currentHours24 % 12 || 12;
+    const hours12Str = hours12.toString().padStart(2, "0");
+    const ampm = currentHours24 >= 12 ? "PM" : "AM";
+    const currentTime12 = `${hours12Str}:${currentMinutesStr} ${ampm}`; // e.g. "04:40 PM"
+    const currentTime12Short = `${hours12}:${currentMinutesStr} ${ampm}`; // e.g. "4:40 PM"
 
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
@@ -34,13 +43,18 @@ export async function GET(request: Request) {
     const dispatched: string[] = [];
 
     for (const user of users) {
-      const preferredTime = user.preferredStudyTime || "20:00";
+      const preferredTime = (user.preferredStudyTime || "20:00").trim();
       
-      // Compare hour part (e.g. "20") or full time string
-      const prefHour = preferredTime.split(":")[0];
-      const matchesHour = prefHour === currentHours || preferredTime === currentTimeStr;
+      // Check if preferredTime matches 24h, 12h, or hour portion
+      const matchesTime =
+        preferredTime === currentTime24 ||
+        preferredTime.toUpperCase() === currentTime12 ||
+        preferredTime.toUpperCase() === currentTime12Short ||
+        preferredTime.startsWith(`${currentHours24Str}:`) ||
+        preferredTime.startsWith(`${hours12Str}:`) ||
+        preferredTime.startsWith(`${hours12}:`);
 
-      if (matchesHour) {
+      if (matchesTime) {
         // Check if user has already achieved their daily goal today
         const todayAttempts = await ExamAttempt.find({
           userId: user._id,
@@ -74,7 +88,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       success: true,
       timestamp: now.toISOString(),
-      currentTimeStr,
+      currentTime24,
       matchingUsersCount: users.length,
       dispatchedCount: dispatched.length,
       dispatchedEmails: dispatched,

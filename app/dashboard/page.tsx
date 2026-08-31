@@ -64,6 +64,8 @@ export default function StudentDashboardPage() {
         setRecentAttempts(statsData.recentAttempts || []);
         setRecommendedCourses(statsData.recommendedCourses || []);
         setAnnouncements(statsData.announcements || []);
+      } else {
+        console.error("Failed to load dashboard stats:", statsData.error);
       }
 
       if (flashcardsData.success) {
