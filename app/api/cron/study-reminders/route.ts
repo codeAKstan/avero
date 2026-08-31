@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/User";
 import ExamAttempt from "@/models/ExamAttempt";
+import PushSubscription from "@/models/PushSubscription";
 import { sendDailyStudyReminderEmail } from "@/lib/email";
 
 export async function GET(request: Request) {
@@ -20,18 +21,17 @@ export async function GET(request: Request) {
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
-    // Query users with email reminders enabled who haven't received a reminder today
+    // Query active users with email or push reminders enabled
     const users = await User.find({
-      emailRemindersEnabled: { $ne: false },
       isSuspended: { $ne: true },
       $or: [
-        { lastReminderSentDate: { $exists: false } },
-        { lastReminderSentDate: null },
-        { lastReminderSentDate: { $lt: startOfToday } },
+        { emailRemindersEnabled: { $ne: false } },
+        { pushRemindersEnabled: { $ne: false } },
       ],
     });
 
-    const dispatched: string[] = [];
+    const dispatchedEmail: string[] = [];
+    const dispatchedPush: string[] = [];
 
     for (const user of users) {
       // Check if user has already achieved their daily goal today
@@ -47,23 +47,44 @@ export async function GET(request: Request) {
 
       const goal = user.dailyQuestionGoal || 20;
 
-      // Dispatch reminder if user hasn't met their goal today
+      // If daily goal is not met yet today
       if (questionsCompletedToday < goal) {
-        try {
-          await sendDailyStudyReminderEmail({
-            to: user.email,
-            fullName: user.fullName,
-            dailyQuestionGoal: goal,
-            preferredStudyTime: user.preferredStudyTime || "20:00",
-          });
+        const leadTime = user.reminderLeadTimeMinutes || 0;
+        const hasBeenRemindedToday = user.lastReminderSentDate && user.lastReminderSentDate >= startOfToday;
+        const hasBeenAdvanceRemindedToday = user.lastAdvanceReminderSentDate && user.lastAdvanceReminderSentDate >= startOfToday;
 
-          // Mark user as reminded today
-          user.lastReminderSentDate = now;
+        let isAdvanceWindow = false;
+        if (leadTime > 0 && !hasBeenAdvanceRemindedToday) {
+          isAdvanceWindow = true;
+        }
+
+        const shouldSendMain = !hasBeenRemindedToday;
+
+        if (shouldSendMain || isAdvanceWindow) {
+          // 1. Dispatch Email if enabled
+          if (user.emailRemindersEnabled !== false) {
+            try {
+              await sendDailyStudyReminderEmail({
+                to: user.email,
+                fullName: user.fullName,
+                dailyQuestionGoal: goal,
+                preferredStudyTime: isAdvanceWindow
+                  ? `${user.preferredStudyTime || "20:00"} (${leadTime}m advance notice)`
+                  : user.preferredStudyTime || "20:00",
+              });
+              dispatchedEmail.push(user.email);
+            } catch (sendErr) {
+              console.error(`Failed to send cron reminder email to ${user.email}:`, sendErr);
+            }
+          }
+
+          // 2. Mark reminder dates on user model
+          if (isAdvanceWindow) {
+            user.lastAdvanceReminderSentDate = now;
+          } else {
+            user.lastReminderSentDate = now;
+          }
           await user.save();
-
-          dispatched.push(user.email);
-        } catch (sendErr) {
-          console.error(`Failed to send cron reminder email to ${user.email}:`, sendErr);
         }
       }
     }
@@ -71,9 +92,9 @@ export async function GET(request: Request) {
     return NextResponse.json({
       success: true,
       timestamp: now.toISOString(),
-      eligibleUsersCount: users.length,
-      dispatchedCount: dispatched.length,
-      dispatchedEmails: dispatched,
+      activeUsersCount: users.length,
+      dispatchedEmailCount: dispatchedEmail.length,
+      dispatchedEmails: dispatchedEmail,
     });
   } catch (error: any) {
     console.error("Cron study-reminders error:", error);

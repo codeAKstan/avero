@@ -14,9 +14,12 @@ export interface IUser extends Document {
   dailyStudyTimeMinutes?: number;
   preferredStudyTime?: string;
   emailRemindersEnabled?: boolean;
+  pushRemindersEnabled?: boolean;
+  reminderLeadTimeMinutes?: number;
   currentStreakDays?: number;
   lastStudyDate?: Date;
   lastReminderSentDate?: Date;
+  lastAdvanceReminderSentDate?: Date;
   isOnboarded: boolean;
   isSuspended?: boolean;
   createdAt: Date;
@@ -82,6 +85,14 @@ const UserSchema: Schema<IUser> = new Schema(
       type: Boolean,
       default: true,
     },
+    pushRemindersEnabled: {
+      type: Boolean,
+      default: true,
+    },
+    reminderLeadTimeMinutes: {
+      type: Number,
+      default: 0,
+    },
     currentStreakDays: {
       type: Number,
       default: 0,
@@ -90,6 +101,9 @@ const UserSchema: Schema<IUser> = new Schema(
       type: Date,
     },
     lastReminderSentDate: {
+      type: Date,
+    },
+    lastAdvanceReminderSentDate: {
       type: Date,
     },
     isOnboarded: {

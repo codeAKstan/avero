@@ -41,6 +41,8 @@ export async function GET() {
         dailyStudyTimeMinutes: user.dailyStudyTimeMinutes ?? 30,
         preferredStudyTime: user.preferredStudyTime ?? "20:00",
         emailRemindersEnabled: user.emailRemindersEnabled !== false,
+        pushRemindersEnabled: user.pushRemindersEnabled !== false,
+        reminderLeadTimeMinutes: user.reminderLeadTimeMinutes ?? 0,
         currentStreakDays: user.currentStreakDays || (todayAttempts.length > 0 ? 1 : 0),
         questionsCompletedToday,
         timeSpentTodayMinutes: Math.round(timeSpentTodaySeconds / 60),
@@ -68,6 +70,8 @@ export async function PUT(request: Request) {
       dailyStudyTimeMinutes,
       preferredStudyTime,
       emailRemindersEnabled,
+      pushRemindersEnabled,
+      reminderLeadTimeMinutes,
       sendTestEmail,
     } = body;
 
@@ -78,6 +82,8 @@ export async function PUT(request: Request) {
     if (dailyStudyTimeMinutes !== undefined) updateData.dailyStudyTimeMinutes = Number(dailyStudyTimeMinutes);
     if (preferredStudyTime !== undefined) updateData.preferredStudyTime = String(preferredStudyTime);
     if (emailRemindersEnabled !== undefined) updateData.emailRemindersEnabled = Boolean(emailRemindersEnabled);
+    if (pushRemindersEnabled !== undefined) updateData.pushRemindersEnabled = Boolean(pushRemindersEnabled);
+    if (reminderLeadTimeMinutes !== undefined) updateData.reminderLeadTimeMinutes = Number(reminderLeadTimeMinutes);
 
     const user = await User.findByIdAndUpdate(
       sessionUser._id,
@@ -113,6 +119,8 @@ export async function PUT(request: Request) {
         dailyStudyTimeMinutes: user.dailyStudyTimeMinutes,
         preferredStudyTime: user.preferredStudyTime,
         emailRemindersEnabled: user.emailRemindersEnabled,
+        pushRemindersEnabled: user.pushRemindersEnabled,
+        reminderLeadTimeMinutes: user.reminderLeadTimeMinutes,
         currentStreakDays: user.currentStreakDays,
       },
       reminderStatus,

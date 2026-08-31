@@ -18,6 +18,8 @@ export default function StudySchedulePage() {
   const [dailyStudyTimeMinutes, setDailyStudyTimeMinutes] = useState<number>(30);
   const [preferredStudyTime, setPreferredStudyTime] = useState<string>("20:00");
   const [emailRemindersEnabled, setEmailRemindersEnabled] = useState<boolean>(true);
+  const [pushRemindersEnabled, setPushRemindersEnabled] = useState<boolean>(true);
+  const [reminderLeadTimeMinutes, setReminderLeadTimeMinutes] = useState<number>(0);
   const [currentStreakDays, setCurrentStreakDays] = useState<number>(0);
 
   const [questionsCompletedToday, setQuestionsCompletedToday] = useState<number>(0);
@@ -25,9 +27,14 @@ export default function StudySchedulePage() {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
+  const [pushPermissionStatus, setPushPermissionStatus] = useState<string>("default");
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      setPushPermissionStatus(Notification.permission);
+    }
+
     fetch("/api/user/schedule")
       .then((res) => res.json())
       .then((data) => {
@@ -37,6 +44,8 @@ export default function StudySchedulePage() {
           setDailyStudyTimeMinutes(s.dailyStudyTimeMinutes || 30);
           setPreferredStudyTime(s.preferredStudyTime || "20:00");
           setEmailRemindersEnabled(s.emailRemindersEnabled !== false);
+          setPushRemindersEnabled(s.pushRemindersEnabled !== false);
+          setReminderLeadTimeMinutes(s.reminderLeadTimeMinutes || 0);
           setCurrentStreakDays(s.currentStreakDays || 0);
           setQuestionsCompletedToday(s.questionsCompletedToday || 0);
           setTimeSpentTodayMinutes(s.timeSpentTodayMinutes || 0);
@@ -45,6 +54,27 @@ export default function StudySchedulePage() {
       .catch((err) => console.error("Error loading study schedule:", err))
       .finally(() => setLoading(false));
   }, []);
+
+  const requestPushPermission = async () => {
+    if (typeof window === "undefined" || !("Notification" in window) || !("serviceWorker" in navigator)) {
+      setMessage({ text: "Browser push notifications are not supported on this device.", type: "error" });
+      return;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      setPushPermissionStatus(permission);
+
+      if (permission === "granted") {
+        const registration = await navigator.serviceWorker.register("/sw.js");
+        setMessage({ text: "Browser push notifications enabled!", type: "success" });
+      } else {
+        setMessage({ text: "Notification permission denied in browser.", type: "error" });
+      }
+    } catch (err) {
+      console.error("Push registration error:", err);
+    }
+  };
 
   const handleSave = async (e?: React.FormEvent, sendTestEmail: boolean = false) => {
     if (e) e.preventDefault();
@@ -60,6 +90,8 @@ export default function StudySchedulePage() {
           dailyStudyTimeMinutes,
           preferredStudyTime,
           emailRemindersEnabled,
+          pushRemindersEnabled,
+          reminderLeadTimeMinutes,
           sendTestEmail,
         }),
       });
@@ -72,6 +104,8 @@ export default function StudySchedulePage() {
           setDailyStudyTimeMinutes(data.schedule.dailyStudyTimeMinutes);
           setPreferredStudyTime(data.schedule.preferredStudyTime);
           setEmailRemindersEnabled(data.schedule.emailRemindersEnabled);
+          setPushRemindersEnabled(data.schedule.pushRemindersEnabled);
+          setReminderLeadTimeMinutes(data.schedule.reminderLeadTimeMinutes);
         }
       } else {
         setMessage({ text: data.error || "Failed to save preferences.", type: "error" });
@@ -251,8 +285,28 @@ export default function StudySchedulePage() {
             </div>
           </div>
 
-          {/* Email Reminders Toggle */}
-          <div className="pt-2">
+          {/* Advance Reminder Lead Time */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+              Advance Reminder Warning Lead Time
+            </label>
+            <div className="relative">
+              <Bell className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <select
+                value={reminderLeadTimeMinutes}
+                onChange={(e) => setReminderLeadTimeMinutes(Number(e.target.value))}
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2866e1]/30 focus:border-[#2866e1] cursor-pointer"
+              >
+                <option value={0}>At target study time only (Default)</option>
+                <option value={15}>15 Minutes before target time</option>
+                <option value={30}>30 Minutes before target time</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Notification Channels Toggles */}
+          <div className="space-y-3 pt-2">
+            {/* Email Reminders Toggle */}
             <label className="flex items-center gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100/80 transition">
               <input
                 type="checkbox"
@@ -269,6 +323,36 @@ export default function StudySchedulePage() {
                 </span>
               </div>
             </label>
+
+            {/* Web Push Reminders Toggle */}
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-4">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={pushRemindersEnabled}
+                  onChange={(e) => setPushRemindersEnabled(e.target.checked)}
+                  className="w-4 h-4 text-[#2866e1] rounded border-slate-300 focus:ring-[#2866e1]"
+                />
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    📱 Mobile & Desktop Browser Push Banners
+                  </span>
+                  <span className="text-[11px] text-slate-500 block">
+                    Pop-up banners on your phone or computer screen even when browser is closed.
+                  </span>
+                </div>
+              </label>
+
+              {pushPermissionStatus !== "granted" && (
+                <button
+                  type="button"
+                  onClick={requestPushPermission}
+                  className="shrink-0 px-3 py-1.5 bg-[#2866e1]/10 text-[#2866e1] hover:bg-[#2866e1]/20 rounded-lg text-xs font-bold transition"
+                >
+                  Enable Permissions
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-end gap-3">
