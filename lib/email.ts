@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import path from "path";
 
 const EMAIL_USER = process.env.EMAIL_USER || "no-reply@avero.academy";
 const EMAIL_PASS = process.env.EMAIL_PASS;
@@ -22,6 +23,12 @@ const transporter = EMAIL_HOST.includes("gmail")
       },
     });
 
+const logoAttachment = {
+  filename: "email-logo.jpeg",
+  path: path.join(process.cwd(), "public", "images", "email-logo.jpeg"),
+  cid: "avero-email-logo",
+};
+
 export async function sendWelcomeEmail({
   to,
   fullName,
@@ -38,10 +45,10 @@ export async function sendWelcomeEmail({
   const subject = "Welcome to AVERO ACADEMY - Your Account is Ready!";
 
   const htmlContent = `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; rounded: 16px; background-color: #ffffff;">
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
       <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #2866e1;">
-        <h1 style="color: #2866e1; margin: 0; font-size: 28px; font-weight: bold; letter-spacing: -0.5px;">AVERO ACADEMY</h1>
-        <p style="color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase; margin-top: 4px;">Nursing Council Exam Prep & Question Bank</p>
+        <img src="cid:avero-email-logo" alt="AVERO ACADEMY" style="max-width: 200px; height: auto; display: block; margin: 0 auto 12px auto;" />
+        <p style="color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase; margin: 4px 0 0 0;">Nursing Council Exam Prep & Question Bank</p>
       </div>
 
       <div style="padding: 24px 0;">
@@ -106,6 +113,7 @@ The AVERO ACADEMY Team
     subject,
     text: textContent,
     html: htmlContent,
+    attachments: [logoAttachment],
   });
 
   return info;
@@ -125,8 +133,8 @@ export async function sendPasswordResetEmail({
   const htmlContent = `
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
       <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #2866e1;">
-        <h1 style="color: #2866e1; margin: 0; font-size: 28px; font-weight: bold; letter-spacing: -0.5px;">AVERO ACADEMY</h1>
-        <p style="color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase; margin-top: 4px;">Password Reset Request</p>
+        <img src="cid:avero-email-logo" alt="AVERO ACADEMY" style="max-width: 200px; height: auto; display: block; margin: 0 auto 12px auto;" />
+        <p style="color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase; margin: 4px 0 0 0;">Password Reset Request</p>
       </div>
 
       <div style="padding: 24px 0;">
@@ -191,6 +199,7 @@ The AVERO ACADEMY Team
     subject,
     text: textContent,
     html: htmlContent,
+    attachments: [logoAttachment],
   });
 
   return info;
@@ -212,8 +221,8 @@ export async function sendDailyStudyReminderEmail({
   const htmlContent = `
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
       <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #2866e1;">
-        <h1 style="color: #2866e1; margin: 0; font-size: 28px; font-weight: bold; letter-spacing: -0.5px;">AVERO ACADEMY</h1>
-        <p style="color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase; margin-top: 4px;">Daily Study Habit Reminder</p>
+        <img src="cid:avero-email-logo" alt="AVERO ACADEMY" style="max-width: 200px; height: auto; display: block; margin: 0 auto 12px auto;" />
+        <p style="color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase; margin: 4px 0 0 0;">Daily Study Habit Reminder</p>
       </div>
 
       <div style="padding: 24px 0;">
@@ -230,7 +239,7 @@ export async function sendDailyStudyReminderEmail({
         </div>
 
         <div style="text-align: center; margin: 28px 0;">
-          <a href="http://localhost:3000/dashboard" style="background-color: #2866e1; color: #ffffff; padding: 14px 28px; text-decoration: none; font-weight: bold; font-size: 15px; border-radius: 12px; display: inline-block;">
+          <a href="https://www.avero.academy/dashboard" style="background-color: #2866e1; color: #ffffff; padding: 14px 28px; text-decoration: none; font-weight: bold; font-size: 15px; border-radius: 12px; display: inline-block;">
             Start Today's Session Now
           </a>
         </div>
@@ -250,7 +259,7 @@ Time for today's study session (${preferredStudyTime})!
 
 Today's Goal: ${dailyQuestionGoal} Questions & Active Recall Flashcards.
 
-Log in now to keep your study streak active: http://localhost:3000/dashboard
+Log in now to keep your study streak active: https://www.avero.academy/dashboard
 
 Best regards,
 The AVERO ACADEMY Team
@@ -272,9 +281,8 @@ The AVERO ACADEMY Team
     subject,
     text: textContent,
     html: htmlContent,
+    attachments: [logoAttachment],
   });
 
   return info;
 }
-
-
