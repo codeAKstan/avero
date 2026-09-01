@@ -18,6 +18,7 @@ import {
   ExternalLink,
   ShieldCheck,
   ChevronRight,
+  Settings,
 } from "lucide-react";
 
 export default function AdminLayout({
@@ -64,6 +65,7 @@ export default function AdminLayout({
     { label: "OCR AI Builder", href: "/admin/courses/new", icon: Sparkles },
     { label: "Exam Analytics", href: "/admin/analytics", icon: BarChart3 },
     { label: "System Banners", href: "/admin/announcements", icon: Megaphone },
+    { label: "Admin Settings", href: "/admin/settings", icon: Settings },
   ];
 
   return (
