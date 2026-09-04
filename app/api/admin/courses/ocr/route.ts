@@ -23,7 +23,12 @@ export async function POST(request: Request) {
 
     const ai = new GoogleGenAI({ apiKey });
 
-    const systemPrompt = `You are a high-speed exam question parser for AVERO ACADEMY. Extract all past exam questions, options, correct answers, and concise clinical rationales into JSON format.
+    const systemPrompt = `You are a high-speed exam question parser for AVERO ACADEMY. Extract all past exam questions, options, correct answers, and exact verbatim rationales into JSON format.
+
+CRITICAL RATIONALE EXTRACTION RULE:
+1. Extract the rationale / explanation EXACTLY as it appears in the source document/text, word-for-word, verbatim.
+2. DO NOT change, rephrase, rewrite, condense, shorten, or summarize the rationale in any way.
+3. Preserve the full text, exact wording, and punctuation of the rationale as presented in the original question paper.
 
 JSON format:
 {
@@ -47,7 +52,7 @@ JSON format:
         "D. Option 4"
       ],
       "correctAnswer": "A. Option 1",
-      "explanation": "Concise rationale for the correct answer."
+      "explanation": "Exact verbatim rationale from the source document without any alteration or summarization."
     }
   ]
 }`;
@@ -69,7 +74,7 @@ JSON format:
 
         promptContents = [
           systemPrompt,
-          "Extract all questions, multiple-choice options, correct answers, and rationales:",
+          "Extract all questions, multiple-choice options, correct answers, and exact verbatim rationales (do NOT edit, change, or summarize the rationales):",
           {
             inlineData: {
               mimeType,
@@ -81,13 +86,13 @@ JSON format:
         console.error("Failed to fetch uploaded document URL for OCR:", fetchErr);
         promptContents = [
           systemPrompt,
-          `Analyze document URL (${documentUrl}) and convert into past questions JSON.`,
+          `Analyze document URL (${documentUrl}) and convert into past questions JSON with exact verbatim rationales.`,
         ];
       }
     } else {
       promptContents = [
         systemPrompt,
-        `Extract past questions JSON from text:\n\n${rawText}`,
+        `Extract past questions JSON from text (do NOT edit, change, or summarize rationales; extract them exact and verbatim):\n\n${rawText}`,
       ];
     }
 

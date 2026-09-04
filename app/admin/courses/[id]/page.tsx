@@ -13,8 +13,12 @@ import {
   Loader2,
   Image as ImageIcon,
   Check,
+  Download,
+  FileSpreadsheet,
+  FileJson,
 } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
+import { exportQuestionBankCSV, exportCoursesJSON } from "@/lib/exportUtils";
 
 export default function EditCoursePage({
   params,
@@ -51,6 +55,46 @@ export default function EditCoursePage({
   const [questions, setQuestions] = useState<
     { question: string; options: string[]; correctAnswer: string; explanation: string }[]
   >([]);
+
+  const handleExportCSV = () => {
+    const currentCourse = {
+      _id: id,
+      title: title || "Untitled Course",
+      slug,
+      category: selectedCategory?.name || "Uncategorized",
+      subcategoryName,
+      description,
+      level,
+      status,
+      timeLimitMinutes,
+      passingScorePercentage,
+      allowedModes,
+      modules,
+      questions,
+      createdAt: new Date().toISOString(),
+    };
+    exportQuestionBankCSV([currentCourse]);
+  };
+
+  const handleExportJSON = () => {
+    const currentCourse = {
+      _id: id,
+      title: title || "Untitled Course",
+      slug,
+      category: selectedCategory?.name || "Uncategorized",
+      subcategoryName,
+      description,
+      level,
+      status,
+      timeLimitMinutes,
+      passingScorePercentage,
+      allowedModes,
+      modules,
+      questions,
+      createdAt: new Date().toISOString(),
+    };
+    exportCoursesJSON([currentCourse]);
+  };
 
   useEffect(() => {
     // Fetch categories
@@ -228,11 +272,32 @@ export default function EditCoursePage({
 
       {/* Main Form */}
       <form onSubmit={handleSave} className="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] overflow-hidden">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
           <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2.5">
             <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-[#2866e1] shrink-0" />
             <span>Edit Course & Past Question Bank</span>
           </h1>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleExportCSV}
+              className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-xl flex items-center gap-1.5 transition cursor-pointer"
+              title="Export Test Bank with Exact Rationales to CSV"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              <span>Export CSV</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleExportJSON}
+              className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-xs font-bold rounded-xl flex items-center gap-1.5 transition cursor-pointer"
+              title="Export Full Course JSON Package"
+            >
+              <FileJson className="w-3.5 h-3.5" />
+              <span>Export JSON</span>
+            </button>
+          </div>
         </div>
 
         {/* Metadata Section */}

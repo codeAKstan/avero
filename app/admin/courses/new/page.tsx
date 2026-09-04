@@ -298,7 +298,7 @@ export default function NewCoursePage() {
             Upload Past Question Papers for OCR AI Parsing
           </h2>
           <p className="text-xs text-slate-500 mt-1 max-w-2xl mb-6">
-            Upload scanned past exam documents, PDF question banks, or images. Gemini AI will convert questions, multiple-choice options (A/B/C/D), correct answers, and clinical rationales for your review.
+            Upload scanned past exam documents, PDF question banks, or images. Gemini AI will extract questions, multiple-choice options (A/B/C/D), correct answers, and exact rationales verbatim without modification or summarization.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

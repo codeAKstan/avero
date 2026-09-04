@@ -11,7 +11,9 @@ import {
   Filter,
   Loader2,
   FolderTree,
+  Download,
 } from "lucide-react";
+import { exportCoursesSummaryCSV } from "@/lib/exportUtils";
 
 export default function StudentCoursesPage() {
   const [courses, setCourses] = useState<any[]>([]);
@@ -65,6 +67,17 @@ export default function StudentCoursesPage() {
             Browse published medical & nursing test banks, complete practice sessions, and build board-exam readiness.
           </p>
         </div>
+
+        {courses.length > 0 && (
+          <button
+            type="button"
+            onClick={() => exportCoursesSummaryCSV(courses, "avero_student_course_catalog")}
+            className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-xs transition cursor-pointer shrink-0"
+          >
+            <Download className="w-4 h-4 text-slate-500" />
+            <span>Export Catalog (CSV)</span>
+          </button>
+        )}
       </div>
 
       {/* Search & Filter Controls */}
