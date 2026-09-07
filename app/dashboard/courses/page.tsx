@@ -101,34 +101,52 @@ export default function StudentCoursesPage() {
           </button>
         </form>
 
-        {/* Category Tabs & Level Filter */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 text-xs">
-          <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto">
-            <button
-              onClick={() => setSelectedCategory("")}
-              className={`px-3 py-1.5 rounded-lg font-semibold transition ${
-                selectedCategory === ""
-                  ? "bg-[#2866e1] text-white"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              All Categories
-            </button>
-            {categories.map((cat) => (
+        {/* Category Tabs & Filter Controls */}
+        <div className="pt-3 border-t border-slate-100 space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            {/* Single-line Horizontal Scrollable Pill Bar */}
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 scroll-smooth flex-1">
               <button
-                key={cat._id}
-                onClick={() => setSelectedCategory(cat._id)}
-                className={`px-3 py-1.5 rounded-lg font-semibold transition ${
-                  selectedCategory === cat._id
-                    ? "bg-[#2866e1] text-white"
+                onClick={() => setSelectedCategory("")}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition shrink-0 ${
+                  selectedCategory === ""
+                    ? "bg-[#2866e1] text-white shadow-xs"
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
               >
-                {cat.name}
+                All Categories
               </button>
-            ))}
+              {categories.map((cat) => (
+                <button
+                  key={cat._id}
+                  onClick={() => setSelectedCategory(cat._id)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition shrink-0 ${
+                    selectedCategory === cat._id
+                      ? "bg-[#2866e1] text-white shadow-xs"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+
+            {/* Category Dropdown */}
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="hidden md:block bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-700 text-xs font-semibold focus:outline-none cursor-pointer shrink-0"
+            >
+              <option value="">Select Category...</option>
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat._id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
           </div>
 
+          {/* Difficulty Level Filter - Commented out for users per request
           <div className="flex items-center gap-2">
             <Filter className="w-3.5 h-3.5 text-slate-400" />
             <select
@@ -142,6 +160,7 @@ export default function StudentCoursesPage() {
               <option value="Advanced">Advanced</option>
             </select>
           </div>
+          */}
         </div>
       </div>
 
@@ -167,9 +186,9 @@ export default function StudentCoursesPage() {
                   <span className="px-2.5 py-0.5 rounded-full bg-[#2866e1]/10 text-[#2866e1] border border-[#2866e1]/20 font-bold text-[10px]">
                     {course.categoryId?.name || "General Nursing"}
                   </span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                  {/* <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
                     {course.level}
-                  </span>
+                  </span> */}
                 </div>
 
                 <h3 className="font-extrabold text-slate-900 text-base mb-2">

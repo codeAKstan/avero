@@ -91,9 +91,9 @@ export default function StudentCourseDetailPage({
           <span className="px-3 py-1 rounded-full bg-[#2866e1]/10 text-[#2866e1] border border-[#2866e1]/20 font-bold text-xs">
             {course.categoryId?.name || "General Medical"}
           </span>
-          <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-600 font-bold text-xs">
+          {/* <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-600 font-bold text-xs">
             {course.level} Level
-          </span>
+          </span> */}
         </div>
 
         <div>

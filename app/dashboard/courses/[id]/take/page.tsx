@@ -18,6 +18,7 @@ import {
   AlertTriangle,
   Bookmark,
 } from "lucide-react";
+import { shuffleArray } from "@/lib/utils";
 
 export default function StudentExamRunnerPage({
   params,
@@ -78,12 +79,13 @@ export default function StudentExamRunnerPage({
           let reqCount = countParam ? parseInt(countParam, 10) : totalAvailable;
           if (isNaN(reqCount) || reqCount <= 0) reqCount = totalAvailable;
 
-          if (reqCount < totalAvailable) {
-            loadedCourse = {
-              ...loadedCourse,
-              questions: loadedCourse.questions.slice(0, reqCount),
-            };
-          }
+          // Always shuffle question presentation order randomly for each session
+          const randomizedQuestions = shuffleArray(loadedCourse.questions || []);
+
+          loadedCourse = {
+            ...loadedCourse,
+            questions: randomizedQuestions.slice(0, reqCount),
+          };
 
           setCourse(loadedCourse);
 

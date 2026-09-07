@@ -334,9 +334,9 @@ export default function StudentDashboardPage() {
                     <span className="px-2.5 py-0.5 rounded-full bg-[#2866e1]/10 text-[#2866e1] border border-[#2866e1]/20 font-bold text-[10px]">
                       {course.categoryId?.name || "General"}
                     </span>
-                    <span className="text-[10px] font-semibold text-slate-400">
+                    {/* <span className="text-[10px] font-semibold text-slate-400">
                       {course.level}
-                    </span>
+                    </span> */}
                   </div>
                   <h3 className="font-bold text-slate-900 text-sm mb-1.5 line-clamp-1">
                     {course.title}

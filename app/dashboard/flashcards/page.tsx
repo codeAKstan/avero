@@ -16,6 +16,7 @@ import {
   BookOpen,
   RefreshCw,
 } from "lucide-react";
+import { shuffleArray } from "@/lib/utils";
 
 export default function FlashcardsPage() {
   const [cards, setCards] = useState<any[]>([]);
@@ -35,7 +36,7 @@ export default function FlashcardsPage() {
       const res = await fetch("/api/user/flashcards?mode=due");
       const data = await res.json();
       if (data.success) {
-        setCards(data.cards || []);
+        setCards(shuffleArray(data.cards || []));
         setDueCount(data.dueCount || 0);
         setTotalCount(data.totalCount || 0);
         setCurrentIndex(0);
