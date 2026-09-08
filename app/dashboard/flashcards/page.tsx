@@ -106,7 +106,7 @@ export default function FlashcardsPage() {
 
   if (isPaywallRequired) {
     return (
-      <div className="bg-white border border-slate-200/80 rounded-3xl p-8 md:p-12 text-center space-y-6 max-w-2xl mx-auto shadow-xs my-8">
+      <div className="bg-white border border-slate-200/80 rounded-3xl p-5 sm:p-8 md:p-12 text-center space-y-5 sm:space-y-6 max-w-2xl mx-auto shadow-xs my-4 sm:my-8">
         <div className="w-16 h-16 rounded-3xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto shadow-xs">
           <Lock className="w-8 h-8 text-amber-500" />
         </div>
