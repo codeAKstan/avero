@@ -19,6 +19,11 @@ export interface ISetting extends Document {
   contactPhone: string;
   address: string;
   copyrightText: string;
+  isSubscriptionEnabled?: boolean;
+  monthlyPriceNaira?: number;
+  annualPriceNaira?: number;
+  paystackMonthlyPlanCode?: string;
+  paystackAnnualPlanCode?: string;
   updatedAt: Date;
 }
 
@@ -45,6 +50,11 @@ const SettingSchema: Schema<ISetting> = new Schema(
     contactPhone: { type: String, default: "" },
     address: { type: String, default: "" },
     copyrightText: { type: String, default: "AVERO ACADEMY Technologies Inc. All rights reserved." },
+    isSubscriptionEnabled: { type: Boolean, default: true },
+    monthlyPriceNaira: { type: Number, default: 5000 },
+    annualPriceNaira: { type: Number, default: 50000 },
+    paystackMonthlyPlanCode: { type: String, default: "" },
+    paystackAnnualPlanCode: { type: String, default: "" },
   },
   {
     timestamps: true,

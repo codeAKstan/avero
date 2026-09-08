@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   BookOpen,
-  Sparkles,
   Plus,
   Search,
   Filter,
@@ -242,7 +241,7 @@ export default function CourseManagementPage() {
             href="/admin/courses/new"
             className="w-full md:w-auto justify-center px-4 py-2.5 bg-[#2866e1] hover:bg-[#1d52bf] text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-md shadow-[#2866e1]/20 transition cursor-pointer"
           >
-            <Sparkles className="w-4 h-4 shrink-0" />
+            <Plus className="w-4 h-4 shrink-0" />
             <span>Create Course (OCR AI or Manual)</span>
           </Link>
         </div>

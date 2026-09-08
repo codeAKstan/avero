@@ -286,3 +286,271 @@ The AVERO ACADEMY Team
 
   return info;
 }
+
+export async function sendSubscriptionActivatedEmail({
+  to,
+  fullName,
+  planName = "Pro Plan",
+  expiresAt,
+  isAdminGranted = false,
+}: {
+  to: string;
+  fullName: string;
+  planName?: string;
+  expiresAt?: Date | string;
+  isAdminGranted?: boolean;
+}) {
+  const subject = `🎉 Your AVERO ACADEMY ${planName} Access is Now Active!`;
+  const formattedExpiry = expiresAt
+    ? new Date(expiresAt).toLocaleDateString("en-US", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : "Lifetime / Recurring";
+
+  const activationSource = isAdminGranted
+    ? "Granted by Administrator"
+    : "Verified via Paystack Payment";
+
+  const htmlContent = `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
+      <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #2866e1;">
+        <img src="cid:avero-email-logo" alt="AVERO ACADEMY" style="max-width: 200px; height: auto; display: block; margin: 0 auto 12px auto;" />
+        <p style="color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase; margin: 4px 0 0 0;">Subscription Activation Notice</p>
+      </div>
+
+      <div style="padding: 24px 0;">
+        <h2 style="color: #0f172a; font-size: 20px; margin-top: 0;">Congratulations, ${fullName}! 🎉</h2>
+        <p style="color: #475569; font-size: 15px; line-height: 1.6;">
+          Your subscription to <strong>AVERO ACADEMY ${planName}</strong> has been successfully activated. You now have unlocked full, unlimited access to our entire question bank repository.
+        </p>
+
+        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 20px 0;">
+          <h3 style="color: #2866e1; font-size: 14px; text-transform: uppercase; margin-top: 0; margin-bottom: 12px; font-weight: 700;">Subscription Summary:</h3>
+          <ul style="color: #334155; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+            <li><strong>Subscriber:</strong> ${fullName} (${to})</li>
+            <li><strong>Access Tier:</strong> ${planName} (PRO Badge Unlocked)</li>
+            <li><strong>Activation Method:</strong> ${activationSource}</li>
+            <li><strong>Valid Until:</strong> ${formattedExpiry}</li>
+            <li><strong>Perks Unlocked:</strong> Unlimited Past Questions, Custom Flashcard Review, Study Schedule Planner & Saved Questions</li>
+          </ul>
+        </div>
+
+        <div style="text-align: center; margin: 28px 0;">
+          <a href="https://www.avero.academy/dashboard" style="background-color: #2866e1; color: #ffffff; padding: 14px 28px; text-decoration: none; font-weight: bold; font-size: 15px; border-radius: 12px; display: inline-block;">
+            Access Your Pro Dashboard
+          </a>
+        </div>
+      </div>
+
+      <div style="text-align: center; padding-top: 20px; border-top: 1px solid #f1f5f9; color: #94a3b8; font-size: 12px;">
+        <p style="margin: 0;">&copy; ${new Date().getFullYear()} AVERO ACADEMY Technologies Inc. All rights reserved.</p>
+        <p style="margin: 4px 0 0 0;">This email confirms your subscription status for ${to}.</p>
+      </div>
+    </div>
+  `;
+
+  const textContent = `
+Dear ${fullName},
+
+Your AVERO ACADEMY ${planName} subscription is now active!
+
+Details:
+- Plan: ${planName}
+- Status: Active
+- Activation: ${activationSource}
+- Expiration Date: ${formattedExpiry}
+
+Unlocked Features:
+- Unlimited Past Questions
+- Custom Flashcard Reviews
+- Automated Study Schedule Planner
+- Saved Questions & Bookmarks
+
+Log in to start practicing: https://www.avero.academy/dashboard
+
+Best regards,
+The AVERO ACADEMY Team
+  `;
+
+  if (!EMAIL_USER || !EMAIL_PASS) {
+    console.warn("EMAIL_USER or EMAIL_PASS missing. Skipping actual SMTP email dispatch for Subscription Activation.");
+    console.log(`[SUBSCRIPTION ACTIVATED MOCK EMAIL] Sent to ${to}`);
+    return { messageId: "mock-sub-active-" + Date.now(), accepted: [to], content: textContent };
+  }
+
+  return await transporter.sendMail({
+    from: EMAIL_FROM,
+    to,
+    subject,
+    text: textContent,
+    html: htmlContent,
+    attachments: [logoAttachment],
+  });
+}
+
+export async function sendSubscriptionExpiringSoonEmail({
+  to,
+  fullName,
+  planName = "Pro Plan",
+  expiresAt,
+  daysLeft = 3,
+}: {
+  to: string;
+  fullName: string;
+  planName?: string;
+  expiresAt?: Date | string;
+  daysLeft?: number;
+}) {
+  const subject = `⚠️ Your AVERO ACADEMY ${planName} Subscription Expires in ${daysLeft} Day${daysLeft === 1 ? "" : "s"}!`;
+  const formattedExpiry = expiresAt
+    ? new Date(expiresAt).toLocaleDateString("en-US", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : "Soon";
+
+  const htmlContent = `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
+      <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #eab308;">
+        <img src="cid:avero-email-logo" alt="AVERO ACADEMY" style="max-width: 200px; height: auto; display: block; margin: 0 auto 12px auto;" />
+        <p style="color: #854d0e; font-size: 13px; font-weight: 600; text-transform: uppercase; margin: 4px 0 0 0;">Subscription Expiration Warning</p>
+      </div>
+
+      <div style="padding: 24px 0;">
+        <h2 style="color: #0f172a; font-size: 20px; margin-top: 0;">Notice for ${fullName}</h2>
+        <p style="color: #475569; font-size: 15px; line-height: 1.6;">
+          Your <strong>AVERO ACADEMY ${planName}</strong> subscription is set to expire on <strong>${formattedExpiry}</strong> (in ${daysLeft} day${daysLeft === 1 ? "" : "s"}).
+        </p>
+
+        <div style="background-color: #fefce8; border: 1px solid #fef08a; border-radius: 12px; padding: 16px; margin: 20px 0;">
+          <h3 style="color: #a16207; font-size: 14px; text-transform: uppercase; margin-top: 0; margin-bottom: 8px; font-weight: 700;">Don't Lose Your Progress:</h3>
+          <p style="color: #713f12; font-size: 14px; margin: 0; line-height: 1.6;">
+            Renew your subscription today to ensure uninterrupted access to unlimited past questions, flashcards, study schedules, and saved questions.
+          </p>
+        </div>
+
+        <div style="text-align: center; margin: 28px 0;">
+          <a href="https://www.avero.academy/pricing" style="background-color: #2866e1; color: #ffffff; padding: 14px 28px; text-decoration: none; font-weight: bold; font-size: 15px; border-radius: 12px; display: inline-block;">
+            Renew Subscription Now
+          </a>
+        </div>
+      </div>
+
+      <div style="text-align: center; padding-top: 20px; border-top: 1px solid #f1f5f9; color: #94a3b8; font-size: 12px;">
+        <p style="margin: 0;">&copy; ${new Date().getFullYear()} AVERO ACADEMY Technologies Inc. All rights reserved.</p>
+        <p style="margin: 4px 0 0 0;">Sent to ${to}.</p>
+      </div>
+    </div>
+  `;
+
+  const textContent = `
+Dear ${fullName},
+
+Your AVERO ACADEMY ${planName} subscription is expiring in ${daysLeft} day(s) on ${formattedExpiry}.
+
+Renew now to keep full access to unlimited past questions, flashcards, and study schedules:
+https://www.avero.academy/pricing
+
+Best regards,
+The AVERO ACADEMY Team
+  `;
+
+  if (!EMAIL_USER || !EMAIL_PASS) {
+    console.warn("EMAIL_USER or EMAIL_PASS missing. Skipping actual SMTP email dispatch for Expiring Subscription.");
+    console.log(`[SUBSCRIPTION EXPIRING MOCK EMAIL] Sent to ${to}`);
+    return { messageId: "mock-sub-expiring-" + Date.now(), accepted: [to], content: textContent };
+  }
+
+  return await transporter.sendMail({
+    from: EMAIL_FROM,
+    to,
+    subject,
+    text: textContent,
+    html: htmlContent,
+    attachments: [logoAttachment],
+  });
+}
+
+export async function sendSubscriptionExpiredEmail({
+  to,
+  fullName,
+}: {
+  to: string;
+  fullName: string;
+}) {
+  const subject = "Your AVERO ACADEMY Pro Subscription Has Expired";
+
+  const htmlContent = `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
+      <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #ef4444;">
+        <img src="cid:avero-email-logo" alt="AVERO ACADEMY" style="max-width: 200px; height: auto; display: block; margin: 0 auto 12px auto;" />
+        <p style="color: #991b1b; font-size: 13px; font-weight: 600; text-transform: uppercase; margin: 4px 0 0 0;">Subscription Expired</p>
+      </div>
+
+      <div style="padding: 24px 0;">
+        <h2 style="color: #0f172a; font-size: 20px; margin-top: 0;">Hello, ${fullName}</h2>
+        <p style="color: #475569; font-size: 15px; line-height: 1.6;">
+          Your <strong>AVERO ACADEMY Pro Subscription</strong> has expired. Your account has automatically reverted to the Freemium plan.
+        </p>
+
+        <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 16px; margin: 20px 0;">
+          <h3 style="color: #991b1b; font-size: 14px; text-transform: uppercase; margin-top: 0; margin-bottom: 8px; font-weight: 700;">Freemium Restrictions Applied:</h3>
+          <ul style="color: #7f1d1d; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+            <li>Limited question access per course</li>
+            <li>Flashcard reviews disabled</li>
+            <li>Study schedule planner locked</li>
+            <li>Saving questions & bookmarks locked</li>
+          </ul>
+        </div>
+
+        <p style="color: #475569; font-size: 15px; line-height: 1.6;">
+          You can upgrade back to Pro anytime to reactivate all features and continue your board exam preparation.
+        </p>
+
+        <div style="text-align: center; margin: 28px 0;">
+          <a href="https://www.avero.academy/pricing" style="background-color: #2866e1; color: #ffffff; padding: 14px 28px; text-decoration: none; font-weight: bold; font-size: 15px; border-radius: 12px; display: inline-block;">
+            Re-Activate Pro Access
+          </a>
+        </div>
+      </div>
+
+      <div style="text-align: center; padding-top: 20px; border-top: 1px solid #f1f5f9; color: #94a3b8; font-size: 12px;">
+        <p style="margin: 0;">&copy; ${new Date().getFullYear()} AVERO ACADEMY Technologies Inc. All rights reserved.</p>
+        <p style="margin: 4px 0 0 0;">Sent to ${to}.</p>
+      </div>
+    </div>
+  `;
+
+  const textContent = `
+Dear ${fullName},
+
+Your AVERO ACADEMY Pro Subscription has expired and your account has reverted to Freemium.
+
+To reactivate full access to questions, flashcards, and study planners:
+https://www.avero.academy/pricing
+
+Best regards,
+The AVERO ACADEMY Team
+  `;
+
+  if (!EMAIL_USER || !EMAIL_PASS) {
+    console.warn("EMAIL_USER or EMAIL_PASS missing. Skipping actual SMTP email dispatch for Expired Subscription.");
+    console.log(`[SUBSCRIPTION EXPIRED MOCK EMAIL] Sent to ${to}`);
+    return { messageId: "mock-sub-expired-" + Date.now(), accepted: [to], content: textContent };
+  }
+
+  return await transporter.sendMail({
+    from: EMAIL_FROM,
+    to,
+    subject,
+    text: textContent,
+    html: htmlContent,
+    attachments: [logoAttachment],
+  });
+}
+

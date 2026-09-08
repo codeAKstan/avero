@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getUserFromSession } from "@/lib/userAuth";
+import { isProUser } from "@/lib/subscription";
 
 export async function GET() {
   try {
@@ -22,6 +23,10 @@ export async function GET() {
         university: user.university,
         gradYear: user.gradYear,
         isOnboarded: user.isOnboarded,
+        subscriptionPlan: user.subscriptionPlan || "free",
+        subscriptionStatus: user.subscriptionStatus || null,
+        subscriptionExpiresAt: user.subscriptionExpiresAt || null,
+        isPro: isProUser(user),
         createdAt: user.createdAt,
       },
     });

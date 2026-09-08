@@ -83,6 +83,12 @@ export default function AdminSettingsPage() {
   const [address, setAddress] = useState("");
   const [copyrightText, setCopyrightText] = useState("AVERO ACADEMY Technologies Inc. All rights reserved.");
 
+  const [isSubscriptionEnabled, setIsSubscriptionEnabled] = useState(true);
+  const [monthlyPriceNaira, setMonthlyPriceNaira] = useState(5000);
+  const [annualPriceNaira, setAnnualPriceNaira] = useState(50000);
+  const [paystackMonthlyPlanCode, setPaystackMonthlyPlanCode] = useState("");
+  const [paystackAnnualPlanCode, setPaystackAnnualPlanCode] = useState("");
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
@@ -115,6 +121,11 @@ export default function AdminSettingsPage() {
         if (s.contactPhone) setContactPhone(s.contactPhone);
         if (s.address) setAddress(s.address);
         if (s.copyrightText) setCopyrightText(s.copyrightText);
+        if (typeof s.isSubscriptionEnabled !== "undefined") setIsSubscriptionEnabled(s.isSubscriptionEnabled);
+        if (typeof s.monthlyPriceNaira === "number") setMonthlyPriceNaira(s.monthlyPriceNaira);
+        if (typeof s.annualPriceNaira === "number") setAnnualPriceNaira(s.annualPriceNaira);
+        if (s.paystackMonthlyPlanCode) setPaystackMonthlyPlanCode(s.paystackMonthlyPlanCode);
+        if (s.paystackAnnualPlanCode) setPaystackAnnualPlanCode(s.paystackAnnualPlanCode);
       }
     } catch (err) {
       console.error("Error fetching admin settings:", err);
@@ -144,6 +155,11 @@ export default function AdminSettingsPage() {
           contactPhone,
           address,
           copyrightText,
+          isSubscriptionEnabled,
+          monthlyPriceNaira,
+          annualPriceNaira,
+          paystackMonthlyPlanCode,
+          paystackAnnualPlanCode,
         }),
       });
 
@@ -346,6 +362,95 @@ export default function AdminSettingsPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+
+        {/* Subscription & Pricing Configuration Section */}
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-6 md:p-8 shadow-xs space-y-6">
+          <div className="border-b border-slate-100 pb-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                💳 Paid Membership & Pricing Settings (Paystack)
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Set subscription rates in Naira (₦) and toggle site-wide paywall controls.
+              </p>
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isSubscriptionEnabled}
+                onChange={(e) => setIsSubscriptionEnabled(e.target.checked)}
+                className="w-4 h-4 text-[#2866e1] rounded border-slate-300 focus:ring-[#2866e1]"
+              />
+              <span className="text-xs font-bold text-slate-700">Enable Subscription Paywall</span>
+            </label>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Monthly Price (NGN) */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                Monthly Subscription Price (₦ NGN)
+              </label>
+              <div className="relative">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-sm">₦</span>
+                <input
+                  type="number"
+                  min={0}
+                  required
+                  value={monthlyPriceNaira}
+                  onChange={(e) => setMonthlyPriceNaira(Number(e.target.value))}
+                  className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2866e1]/30 focus:border-[#2866e1]"
+                />
+              </div>
+            </div>
+
+            {/* Annual Price (NGN) */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                Annual Subscription Price (₦ NGN)
+              </label>
+              <div className="relative">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-sm">₦</span>
+                <input
+                  type="number"
+                  min={0}
+                  required
+                  value={annualPriceNaira}
+                  onChange={(e) => setAnnualPriceNaira(Number(e.target.value))}
+                  className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2866e1]/30 focus:border-[#2866e1]"
+                />
+              </div>
+            </div>
+
+            {/* Paystack Monthly Plan Code */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                Paystack Monthly Plan Code (Optional)
+              </label>
+              <input
+                type="text"
+                placeholder="PLN_monthly_..."
+                value={paystackMonthlyPlanCode}
+                onChange={(e) => setPaystackMonthlyPlanCode(e.target.value)}
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2866e1]/30 focus:border-[#2866e1]"
+              />
+            </div>
+
+            {/* Paystack Annual Plan Code */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                Paystack Annual Plan Code (Optional)
+              </label>
+              <input
+                type="text"
+                placeholder="PLN_annual_..."
+                value={paystackAnnualPlanCode}
+                onChange={(e) => setPaystackAnnualPlanCode(e.target.value)}
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2866e1]/30 focus:border-[#2866e1]"
+              />
+            </div>
           </div>
         </div>
 

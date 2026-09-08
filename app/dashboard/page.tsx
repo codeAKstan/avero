@@ -10,7 +10,6 @@ import {
   XCircle,
   ArrowRight,
   RefreshCw,
-  Sparkles,
   BookOpen,
   Megaphone,
   BarChart2,
@@ -123,7 +122,7 @@ export default function StudentDashboardPage() {
               href="/dashboard/courses"
               className="px-5 py-2.5 bg-white text-[#2866e1] hover:bg-blue-50 rounded-xl text-xs font-bold shadow-md flex items-center gap-2 transition cursor-pointer"
             >
-              <Sparkles className="w-4 h-4" />
+              <BookOpen className="w-4 h-4" />
               <span>Browse Test Banks</span>
             </Link>
           </div>

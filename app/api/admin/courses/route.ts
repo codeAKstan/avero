@@ -63,6 +63,8 @@ export async function POST(request: Request) {
       modules,
       questions,
       sourceDocumentUrl,
+      isFreeAccess,
+      freeQuestionLimit,
     } = body;
 
     if (!title || !categoryId || !description) {
@@ -104,6 +106,8 @@ export async function POST(request: Request) {
       modules: modules || [],
       questions: questions || [],
       sourceDocumentUrl: sourceDocumentUrl || "",
+      isFreeAccess: isFreeAccess !== undefined ? Boolean(isFreeAccess) : true,
+      freeQuestionLimit: typeof freeQuestionLimit === "number" ? freeQuestionLimit : 5,
     });
 
     return NextResponse.json({

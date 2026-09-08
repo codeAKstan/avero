@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
-  Sparkles,
   BookOpen,
   ArrowRight,
 } from "lucide-react";
@@ -56,7 +55,7 @@ export default function StudentAnalyticsPage() {
           href="/dashboard/courses"
           className="px-4 py-2 bg-[#2866e1] hover:bg-[#1d52bf] text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition self-start md:self-auto"
         >
-          <Sparkles className="w-4 h-4" /> Start New Practice
+          <BookOpen className="w-4 h-4" /> Start New Practice
         </Link>
       </div>
 

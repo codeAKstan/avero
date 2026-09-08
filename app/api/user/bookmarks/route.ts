@@ -2,12 +2,20 @@ import { NextResponse } from "next/server";
 import { getUserFromSession } from "@/lib/userAuth";
 import { connectToDatabase } from "@/lib/mongodb";
 import Bookmark from "@/models/Bookmark";
+import { isProUser } from "@/lib/subscription";
 
 export async function GET() {
   try {
     const sessionUser = await getUserFromSession();
     if (!sessionUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!isProUser(sessionUser)) {
+      return NextResponse.json(
+        { error: "Saving and viewing bookmarked questions is a Pro feature.", code: "PRO_REQUIRED" },
+        { status: 403 }
+      );
     }
 
     await connectToDatabase();
@@ -34,6 +42,13 @@ export async function POST(request: Request) {
     const sessionUser = await getUserFromSession();
     if (!sessionUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!isProUser(sessionUser)) {
+      return NextResponse.json(
+        { error: "Saving and viewing bookmarked questions is a Pro feature.", code: "PRO_REQUIRED" },
+        { status: 403 }
+      );
     }
 
     const body = await request.json();

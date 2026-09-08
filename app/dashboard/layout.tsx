@@ -15,11 +15,11 @@ import {
   X,
   GraduationCap,
   ChevronRight,
-  Sparkles,
   UserCheck,
   Brain,
   Bookmark,
   Calendar,
+  Zap,
 } from "lucide-react";
 
 export default function StudentDashboardLayout({
@@ -35,6 +35,7 @@ export default function StudentDashboardLayout({
     email: string;
     studentType?: string;
     university?: string;
+    isPro?: boolean;
   } | null>(null);
 
   useEffect(() => {
@@ -161,9 +162,14 @@ export default function StudentDashboardLayout({
         {/* Student Profile Footer & Logout */}
         <div className="p-4 border-t border-slate-100 bg-slate-50/50 shrink-0">
           <div className="mb-3 px-2">
-            <p className="text-xs font-bold text-slate-900 truncate">
-              {studentUser?.fullName || "Student Account"}
-            </p>
+            <div className="flex items-center gap-1.5 font-bold text-slate-900 text-xs">
+              <span className="truncate">{studentUser?.fullName || "Student Account"}</span>
+              {studentUser?.isPro && (
+                <span className="inline-flex items-center gap-0.5 px-2 py-0.5 bg-amber-500 text-white rounded-full text-[9px] font-extrabold uppercase tracking-wide shadow-xs shrink-0">
+                  <Zap className="w-2.5 h-2.5 fill-white" /> PRO
+                </span>
+              )}
+            </div>
             <p className="text-[11px] text-slate-500 truncate">
               {studentUser?.studentType || "Healthcare Candidate"}
             </p>
@@ -204,7 +210,7 @@ export default function StudentDashboardLayout({
               href="/dashboard/courses"
               className="flex items-center gap-2 px-4 py-2 bg-[#2866e1] hover:bg-[#1d52bf] text-white rounded-xl text-xs font-bold shadow-sm hover:shadow-md transition cursor-pointer"
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <BookOpen className="w-3.5 h-3.5" />
               Start Practice Session
             </Link>
           </div>

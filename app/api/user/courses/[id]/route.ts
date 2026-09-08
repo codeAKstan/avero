@@ -3,6 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { getUserFromSession } from "@/lib/userAuth";
 import Course from "@/models/Course";
 import ExamAttempt from "@/models/ExamAttempt";
+import { filterCourseQuestionsForUser } from "@/lib/subscription";
 
 export async function GET(
   request: Request,
@@ -17,21 +18,39 @@ export async function GET(
     const { id } = await params;
     await connectToDatabase();
 
-    const course = await Course.findById(id)
+    const rawCourse = await Course.findById(id)
       .populate("categoryId", "name slug icon")
       .lean();
 
-    if (!course || course.status !== "Published") {
+    if (!rawCourse || rawCourse.status !== "Published") {
       return NextResponse.json(
         { error: "Course not found or unavailable." },
         { status: 404 }
       );
     }
 
+    // Apply course question filtering based on user subscription
+    const accessInfo = filterCourseQuestionsForUser(rawCourse as any, user);
+    
+    if (!accessInfo.allowed) {
+      return NextResponse.json(
+        { error: accessInfo.reason || "This course requires a Pro membership.", code: "PRO_REQUIRED" },
+        { status: 403 }
+      );
+    }
+
+    const course = {
+      ...rawCourse,
+      questions: accessInfo.questions,
+      totalOriginalQuestions: accessInfo.totalQuestions,
+      isRestricted: accessInfo.isRestricted,
+      freeQuestionLimit: accessInfo.freeLimit,
+    };
+
     // Get user's previous attempts for this course
     const previousAttempts = await ExamAttempt.find({
       userId: user._id,
-      courseId: course._id,
+      courseId: rawCourse._id,
     })
       .sort({ createdAt: -1 })
       .lean();
@@ -40,6 +59,7 @@ export async function GET(
       success: true,
       course,
       previousAttempts,
+      accessInfo,
     });
   } catch (error: any) {
     console.error("Error in /api/user/courses/[id]:", error);

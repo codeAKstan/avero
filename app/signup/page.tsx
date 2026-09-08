@@ -13,7 +13,6 @@ import {
   Lock,
   User as UserIcon,
   ChevronDown,
-  Sparkles,
   RefreshCw,
   BookOpen,
   Eye,

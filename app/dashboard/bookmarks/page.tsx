@@ -8,20 +8,29 @@ import {
   BookOpen,
   CheckCircle2,
   Loader2,
-  Sparkles,
   Search,
 } from "lucide-react";
+
+import PaywallModal from "@/components/PaywallModal";
+import { Lock, ArrowRight } from "lucide-react";
 
 export default function BookmarksPage() {
   const [bookmarks, setBookmarks] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isPaywallRequired, setIsPaywallRequired] = useState<boolean>(false);
+  const [showPaywallModal, setShowPaywallModal] = useState<boolean>(true);
 
   const fetchBookmarks = async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/user/bookmarks");
       const data = await res.json();
+      if (res.status === 403 && data.code === "PRO_REQUIRED") {
+        setIsPaywallRequired(true);
+        setShowPaywallModal(true);
+        return;
+      }
       if (data.success) {
         setBookmarks(data.bookmarks || []);
       }
@@ -67,6 +76,41 @@ export default function BookmarksPage() {
       <div className="py-20 flex justify-center items-center text-slate-500 gap-3">
         <Loader2 className="w-6 h-6 animate-spin text-[#2866e1]" />
         <span className="text-sm">Loading saved question bank...</span>
+      </div>
+    );
+  }
+
+  if (isPaywallRequired) {
+    return (
+      <div className="bg-white border border-slate-200/80 rounded-3xl p-8 md:p-12 text-center space-y-6 max-w-2xl mx-auto shadow-xs my-8">
+        <div className="w-16 h-16 rounded-3xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto shadow-xs">
+          <Lock className="w-8 h-8 text-amber-500" />
+        </div>
+        <div className="space-y-2">
+          <span className="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-xs font-bold">
+            Pro Feature Locked
+          </span>
+          <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight pt-1">
+            Bookmarked Questions are Exclusive to Pro
+          </h2>
+          <p className="text-xs md:text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
+            Upgrade your account to Avero Pro to bookmark challenging questions, create revision lists, and review detailed clinical rationales anytime.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setShowPaywallModal(true)}
+          className="px-6 py-2.5 bg-[#2866e1] hover:bg-[#1d52bf] text-white font-bold text-xs rounded-xl shadow-xs transition cursor-pointer"
+        >
+          Upgrade to Avero Pro
+        </button>
+
+        <PaywallModal
+          isOpen={showPaywallModal}
+          onClose={() => setShowPaywallModal(false)}
+          title="Unlock Bookmarked Questions"
+        />
       </div>
     );
   }

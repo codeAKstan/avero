@@ -3,7 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/User";
 import ExamAttempt from "@/models/ExamAttempt";
 import PushSubscription from "@/models/PushSubscription";
-import { sendDailyStudyReminderEmail } from "@/lib/email";
+import { sendDailyStudyReminderEmail, sendSubscriptionExpiringSoonEmail, sendSubscriptionExpiredEmail } from "@/lib/email";
 
 export async function GET(request: Request) {
   try {
@@ -20,6 +20,67 @@ export async function GET(request: Request) {
     const now = new Date();
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
+
+    const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+
+    // Process expiring & expired subscriptions
+    const proUsers = await User.find({
+      subscriptionPlan: "pro",
+      subscriptionExpiresAt: { $exists: true, $ne: null },
+    });
+
+    const expiringSoonEmailsSent: string[] = [];
+    const expiredEmailsSent: string[] = [];
+
+    for (const proUser of proUsers) {
+      if (!proUser.subscriptionExpiresAt) continue;
+
+      const expiresAt = new Date(proUser.subscriptionExpiresAt);
+
+      // 1. Subscription has EXPIRED
+      if (expiresAt <= now) {
+        proUser.subscriptionPlan = "free";
+        proUser.subscriptionStatus = "past_due";
+        proUser.lastExpiredNoticeSentDate = now;
+        await proUser.save();
+
+        try {
+          await sendSubscriptionExpiredEmail({
+            to: proUser.email,
+            fullName: proUser.fullName,
+          });
+          expiredEmailsSent.push(proUser.email);
+        } catch (expErr) {
+          console.error(`Failed to send subscription expired email to ${proUser.email}:`, expErr);
+        }
+      }
+      // 2. Subscription is EXPIRING SOON (within 3 days)
+      else if (expiresAt <= threeDaysFromNow) {
+        const hasSentExpiringNoticeRecently =
+          proUser.lastExpiringNoticeSentDate &&
+          now.getTime() - new Date(proUser.lastExpiringNoticeSentDate).getTime() < 3 * 24 * 60 * 60 * 1000;
+
+        if (!hasSentExpiringNoticeRecently) {
+          const diffMs = expiresAt.getTime() - now.getTime();
+          const daysLeft = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+
+          try {
+            await sendSubscriptionExpiringSoonEmail({
+              to: proUser.email,
+              fullName: proUser.fullName,
+              expiresAt,
+              daysLeft,
+            });
+            expiringSoonEmailsSent.push(proUser.email);
+
+            proUser.lastExpiringNoticeSentDate = now;
+            await proUser.save();
+          } catch (warnErr) {
+            console.error(`Failed to send expiring soon email to ${proUser.email}:`, warnErr);
+          }
+        }
+      }
+    }
 
     // Query active users with email or push reminders enabled
     const users = await User.find({
@@ -95,6 +156,8 @@ export async function GET(request: Request) {
       activeUsersCount: users.length,
       dispatchedEmailCount: dispatchedEmail.length,
       dispatchedEmails: dispatchedEmail,
+      expiringSoonEmailsSent,
+      expiredEmailsSent,
     });
   } catch (error: any) {
     console.error("Cron study-reminders error:", error);

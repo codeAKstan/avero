@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
-import { School, Mail, ArrowRight, CheckCircle2, Clock, Sparkles, ShieldCheck, Users, BookOpen } from "lucide-react";
+import { School, Mail, ArrowRight, CheckCircle2, Clock, ShieldCheck, Users, BookOpen } from "lucide-react";
 import Link from "next/link";
 import gsap from "gsap";
 

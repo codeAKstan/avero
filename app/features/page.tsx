@@ -5,7 +5,7 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { Features } from "../components/Features";
 import { LearningTools } from "../components/LearningTools";
-import { CheckCircle2, ArrowRight, Brain, Target, ShieldCheck, Sparkles, BookOpen, Clock, Users, FileText } from "lucide-react";
+import { CheckCircle2, ArrowRight, Brain, Target, ShieldCheck, BookOpen, Clock, Users, FileText } from "lucide-react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";

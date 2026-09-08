@@ -4,12 +4,20 @@ import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/User";
 import ExamAttempt from "@/models/ExamAttempt";
 import { sendDailyStudyReminderEmail } from "@/lib/email";
+import { isProUser } from "@/lib/subscription";
 
 export async function GET() {
   try {
     const sessionUser = await getUserFromSession();
     if (!sessionUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!isProUser(sessionUser)) {
+      return NextResponse.json(
+        { error: "The daily study schedule planner is exclusive to Pro members.", code: "PRO_REQUIRED" },
+        { status: 403 }
+      );
     }
 
     await connectToDatabase();
@@ -62,6 +70,13 @@ export async function PUT(request: Request) {
     const sessionUser = await getUserFromSession();
     if (!sessionUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!isProUser(sessionUser)) {
+      return NextResponse.json(
+        { error: "The daily study schedule planner is exclusive to Pro members.", code: "PRO_REQUIRED" },
+        { status: 403 }
+      );
     }
 
     const body = await request.json();

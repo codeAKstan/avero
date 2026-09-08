@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { HowItWorks } from "../components/HowItWorks";
-import { BookOpen, FileCheck2, BarChart3, ArrowRight, CheckCircle2, School, GraduationCap, Sparkles } from "lucide-react";
+import { BookOpen, FileCheck2, BarChart3, ArrowRight, CheckCircle2, School, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";

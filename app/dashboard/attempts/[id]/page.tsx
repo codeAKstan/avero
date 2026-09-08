@@ -11,7 +11,6 @@ import {
   BookOpen,
   Loader2,
   HelpCircle,
-  Sparkles,
   Bookmark,
 } from "lucide-react";
 
@@ -296,7 +295,7 @@ export default function StudentAttemptDetailReviewPage({
             {ans.explanation && (
               <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-800 leading-relaxed space-y-1">
                 <div className="font-bold text-slate-900 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-[#2866e1]" />
+                  <BookOpen className="w-3.5 h-3.5 text-[#2866e1]" />
                   <span>Clinical Rationale & Learning Concept</span>
                 </div>
                 <p className="text-slate-700">{ans.explanation}</p>

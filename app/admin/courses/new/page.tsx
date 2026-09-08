@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Sparkles,
   BookOpen,
   FileText,
   HelpCircle,
@@ -15,6 +14,10 @@ import {
   Image as ImageIcon,
   FolderTree,
   Check,
+  ChevronUp,
+  ChevronDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { UploadDropzone, UploadButton } from "@/lib/uploadthing";
 
@@ -46,6 +49,10 @@ export default function NewCoursePage() {
   const [timeLimitMinutes, setTimeLimitMinutes] = useState(60);
   const [passingScorePercentage, setPassingScorePercentage] = useState(75);
   const [allowedModes, setAllowedModes] = useState<("Practice" | "Exam")[]>(["Practice", "Exam"]);
+
+  // Freemium Access Controls
+  const [isFreeAccess, setIsFreeAccess] = useState(true);
+  const [freeQuestionLimit, setFreeQuestionLimit] = useState(5);
   
   // Lesson Modules & Past Questions
   const [modules, setModules] = useState<
@@ -59,6 +66,18 @@ export default function NewCoursePage() {
   >([]);
 
   const [saving, setSaving] = useState(false);
+
+  const scrollToTop = () => {
+    const main = document.querySelector("main");
+    if (main) main.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const scrollToBottom = () => {
+    const main = document.querySelector("main");
+    if (main) main.scrollTo({ top: main.scrollHeight, behavior: "smooth" });
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  };
 
   useEffect(() => {
     fetch("/api/admin/categories")
@@ -169,6 +188,28 @@ export default function NewCoursePage() {
     setModules((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const moveModuleUp = (index: number) => {
+    if (index === 0) return;
+    setModules((prev) => {
+      const updated = [...prev];
+      const temp = updated[index - 1];
+      updated[index - 1] = updated[index];
+      updated[index] = temp;
+      return updated.map((m, i) => ({ ...m, order: i + 1 }));
+    });
+  };
+
+  const moveModuleDown = (index: number) => {
+    if (index === modules.length - 1) return;
+    setModules((prev) => {
+      const updated = [...prev];
+      const temp = updated[index + 1];
+      updated[index + 1] = updated[index];
+      updated[index] = temp;
+      return updated.map((m, i) => ({ ...m, order: i + 1 }));
+    });
+  };
+
   // Past Questions handlers
   const addQuestion = () => {
     setQuestions((prev) => [
@@ -208,6 +249,28 @@ export default function NewCoursePage() {
     setQuestions((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const moveQuestionUp = (index: number) => {
+    if (index === 0) return;
+    setQuestions((prev) => {
+      const updated = [...prev];
+      const temp = updated[index - 1];
+      updated[index - 1] = updated[index];
+      updated[index] = temp;
+      return updated;
+    });
+  };
+
+  const moveQuestionDown = (index: number) => {
+    if (index === questions.length - 1) return;
+    setQuestions((prev) => {
+      const updated = [...prev];
+      const temp = updated[index + 1];
+      updated[index + 1] = updated[index];
+      updated[index] = temp;
+      return updated;
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !categoryId || !description) {
@@ -235,6 +298,8 @@ export default function NewCoursePage() {
           modules,
           questions,
           sourceDocumentUrl: uploadedDocUrl,
+          isFreeAccess,
+          freeQuestionLimit,
         }),
       });
 
@@ -270,7 +335,7 @@ export default function NewCoursePage() {
                 : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5 shrink-0" />
+            <FileText className="w-3.5 h-3.5 shrink-0" />
             <span>OCR AI Document Converter</span>
           </button>
           <button
@@ -291,7 +356,7 @@ export default function NewCoursePage() {
       {mode === "ocr" && (
         <div className="bg-white border border-[#2866e1]/20 rounded-2xl p-4 sm:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden">
           <div className="flex items-center gap-2 text-[#2866e1] font-extrabold text-[11px] sm:text-xs mb-2">
-            <Sparkles className="w-4 h-4 shrink-0" />
+            <FileText className="w-4 h-4 shrink-0" />
             <span>GEMINI 3.6 FLASH OCR — PAST QUESTION CONVERTER</span>
           </div>
           <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 leading-snug">
@@ -360,7 +425,7 @@ export default function NewCoursePage() {
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 shrink-0" />
+                  <FileText className="w-4 h-4 shrink-0" />
                   <span>Convert Past Questions with AI</span>
                 </>
               )}
@@ -512,6 +577,48 @@ export default function NewCoursePage() {
               </label>
             </div>
           </div>
+
+          {/* Freemium Access & Question Limit Controls */}
+          <div className="sm:col-span-2 p-4 bg-blue-50/60 border border-blue-200/80 rounded-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  🔒 Freemium Student Access Controls
+                </h4>
+                <p className="text-[11px] text-slate-500">
+                  Control whether free users can practice this course and how many questions they can view before being prompted to upgrade to Pro.
+                </p>
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-blue-200 rounded-xl">
+                <input
+                  type="checkbox"
+                  checked={isFreeAccess}
+                  onChange={(e) => setIsFreeAccess(e.target.checked)}
+                  className="w-4 h-4 text-[#2866e1] rounded border-slate-300"
+                />
+                <span className="text-xs font-bold text-slate-800">Allow Free Access</span>
+              </label>
+            </div>
+
+            {isFreeAccess && (
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Free Student Question Limit
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  max={questions.length || 500}
+                  value={freeQuestionLimit}
+                  onChange={(e) => setFreeQuestionLimit(parseInt(e.target.value, 10) || 0)}
+                  className="w-full max-w-xs p-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-900"
+                />
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Free users will be able to solve up to <strong className="text-slate-900">{freeQuestionLimit} questions</strong> in this course. Question #{freeQuestionLimit + 1} onwards will require a Pro membership.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Description */}
@@ -586,13 +693,35 @@ export default function NewCoursePage() {
                     <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
                       Question #{qIdx + 1}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => removeQuestion(qIdx)}
-                      className="text-slate-400 hover:text-rose-600 transition"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => moveQuestionUp(qIdx)}
+                        disabled={qIdx === 0}
+                        className="p-1.5 text-slate-500 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Move Question Up"
+                      >
+                        <ChevronUp className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveQuestionDown(qIdx)}
+                        disabled={qIdx === questions.length - 1}
+                        className="p-1.5 text-slate-500 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Move Question Down"
+                      >
+                        <ChevronDown className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeQuestion(qIdx)}
+                        className="p-1.5 text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition cursor-pointer"
+                        title="Delete Question"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
                   <div>
@@ -680,13 +809,35 @@ export default function NewCoursePage() {
                   <span className="text-xs font-bold text-[#2866e1] uppercase tracking-wider">
                     Lesson {index + 1}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => removeModule(index)}
-                    className="text-slate-400 hover:text-rose-600 transition"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => moveModuleUp(index)}
+                      disabled={index === 0}
+                      className="p-1.5 text-slate-500 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                      title="Move Module Up"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moveModuleDown(index)}
+                      disabled={index === modules.length - 1}
+                      className="p-1.5 text-slate-500 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                      title="Move Module Down"
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeModule(index)}
+                      className="p-1.5 text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition cursor-pointer"
+                      title="Delete Module"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
@@ -757,6 +908,40 @@ export default function NewCoursePage() {
           </button>
         </div>
       </form>
+
+      {/* Floating Page Navigation & Quick Save Widget */}
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 p-2 rounded-2xl shadow-2xl text-white">
+        <button
+          type="button"
+          onClick={scrollToTop}
+          className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl transition cursor-pointer"
+          title="Scroll to Top"
+        >
+          <ArrowUp className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={scrollToBottom}
+          className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl transition cursor-pointer"
+          title="Scroll to Bottom"
+        >
+          <ArrowDown className="w-4 h-4" />
+        </button>
+        <div className="h-5 w-px bg-slate-700 mx-1" />
+        <button
+          type="button"
+          onClick={(e) => handleSubmit(e)}
+          disabled={saving}
+          className="px-4 py-2.5 bg-[#2866e1] hover:bg-[#1d52bf] text-white font-extrabold text-xs rounded-xl shadow-md flex items-center gap-2 transition cursor-pointer disabled:opacity-50"
+        >
+          {saving ? (
+            <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+          ) : (
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+          )}
+          <span>Save Course</span>
+        </button>
+      </div>
     </div>
   );
 }

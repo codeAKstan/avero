@@ -3,12 +3,20 @@ import { getUserFromSession } from "@/lib/userAuth";
 import { connectToDatabase } from "@/lib/mongodb";
 import FlashcardProgress from "@/models/FlashcardProgress";
 import Course from "@/models/Course";
+import { isProUser } from "@/lib/subscription";
 
 export async function GET(request: Request) {
   try {
     const sessionUser = await getUserFromSession();
     if (!sessionUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!isProUser(sessionUser)) {
+      return NextResponse.json(
+        { error: "Spaced-repetition flashcards are exclusive to Pro members.", code: "PRO_REQUIRED" },
+        { status: 403 }
+      );
     }
 
     await connectToDatabase();

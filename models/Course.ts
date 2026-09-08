@@ -32,6 +32,8 @@ export interface ICourse extends Document {
   modules: ICourseModule[];
   questions: IQuestion[];
   sourceDocumentUrl?: string;
+  isFreeAccess?: boolean;
+  freeQuestionLimit?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -115,6 +117,14 @@ const CourseSchema: Schema<ICourse> = new Schema(
     sourceDocumentUrl: {
       type: String,
       default: "",
+    },
+    isFreeAccess: {
+      type: Boolean,
+      default: true,
+    },
+    freeQuestionLimit: {
+      type: Number,
+      default: 5,
     },
   },
   {

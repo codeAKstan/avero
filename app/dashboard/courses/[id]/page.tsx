@@ -14,8 +14,9 @@ import {
   ArrowLeft,
   Loader2,
   Zap,
-  ShieldAlert,
+  Lock,
 } from "lucide-react";
+import PaywallModal from "@/components/PaywallModal";
 
 export default function StudentCourseDetailPage({
   params,
@@ -30,6 +31,7 @@ export default function StudentCourseDetailPage({
   const [loading, setLoading] = useState(true);
   const [selectedMode, setSelectedMode] = useState<"Practice" | "Exam">("Practice");
   const [questionCount, setQuestionCount] = useState<number>(0);
+  const [showPaywallModal, setShowPaywallModal] = useState<boolean>(false);
 
   useEffect(() => {
     fetch(`/api/user/courses/${id}`)
@@ -91,9 +93,6 @@ export default function StudentCourseDetailPage({
           <span className="px-3 py-1 rounded-full bg-[#2866e1]/10 text-[#2866e1] border border-[#2866e1]/20 font-bold text-xs">
             {course.categoryId?.name || "General Medical"}
           </span>
-          {/* <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-600 font-bold text-xs">
-            {course.level} Level
-          </span> */}
         </div>
 
         <div>
@@ -112,7 +111,13 @@ export default function StudentCourseDetailPage({
             </div>
             <div>
               <div className="text-slate-400 font-medium text-[10px] uppercase">Question Count</div>
-              <div className="font-bold text-slate-900">{course.questions?.length || 0} Questions</div>
+              <div className="font-bold text-slate-900">
+                {course.isRestricted ? (
+                  <span>{course.questions?.length || 0} / {course.totalOriginalQuestions || 0} Free Qs</span>
+                ) : (
+                  <span>{course.questions?.length || 0} Questions</span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -147,6 +152,39 @@ export default function StudentCourseDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Freemium Limit & Pro Upgrade Notice */}
+      {course.isRestricted && (
+        <div className="bg-gradient-to-r from-amber-50/90 via-amber-50 to-orange-50/60 border-2 border-amber-200 rounded-2xl p-5 md:p-6 shadow-xs space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 text-amber-700 flex items-center justify-center shrink-0 shadow-2xs">
+              <Lock className="w-5 h-5 text-amber-600" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="font-extrabold text-slate-900 text-sm">
+                  Freemium Access ({course.questions?.length} of {course.totalOriginalQuestions} Questions Available)
+                </span>
+                <span className="px-2.5 py-0.5 bg-amber-100 text-amber-800 border border-amber-300 rounded-full text-[10px] font-extrabold uppercase">
+                  Freemium Preview
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed max-w-xl">
+                You are currently limited to the first <strong>{course.questions?.length} questions</strong> of this test bank. Upgrade to Avero Pro to unlock all <strong>{course.totalOriginalQuestions} questions</strong> and detailed rationales!
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowPaywallModal(true)}
+            className="w-full sm:w-auto px-5 py-2.5 bg-[#2866e1] hover:bg-[#1d52bf] text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-2 transition shrink-0 cursor-pointer"
+          >
+            <Zap className="w-4 h-4 text-amber-300" />
+            <span>Upgrade to Access All ({course.totalOriginalQuestions}) Questions</span>
+          </button>
+        </div>
+      )}
 
       {/* Mode Selection Section */}
       <div className="bg-white border border-slate-200/80 rounded-2xl p-6 md:p-8 shadow-xs space-y-6">
@@ -255,6 +293,17 @@ export default function StudentCourseDetailPage({
             >
               All ({course.questions?.length || 0})
             </button>
+
+            {course.isRestricted && (
+              <button
+                type="button"
+                onClick={() => setShowPaywallModal(true)}
+                className="px-3.5 py-1.5 rounded-xl font-bold text-xs bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100 flex items-center gap-1.5 transition cursor-pointer"
+              >
+                <Lock className="w-3.5 h-3.5 text-amber-600" />
+                <span>Unlock All {course.totalOriginalQuestions} Qs (Pro)</span>
+              </button>
+            )}
           </div>
 
           <div className="flex items-center gap-3 pt-1">
@@ -283,6 +332,19 @@ export default function StudentCourseDetailPage({
           <PlayCircle className="w-5 h-5" />
           <span>Launch {selectedMode} Session ({questionCount} Questions)</span>
         </button>
+
+        {course.isRestricted && (
+          <div className="text-center pt-2">
+            <button
+              type="button"
+              onClick={() => setShowPaywallModal(true)}
+              className="text-xs font-bold text-[#2866e1] hover:underline inline-flex items-center gap-1.5 cursor-pointer"
+            >
+              <Zap className="w-3.5 h-3.5 text-amber-500" />
+              <span>Want to access all {course.totalOriginalQuestions} questions in this course? Click here to Upgrade to Avero Pro →</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Modules Syllabus Breakdown */}
@@ -304,6 +366,14 @@ export default function StudentCourseDetailPage({
           </div>
         </div>
       )}
+
+      {/* Pro Upgrade Paywall Modal */}
+      <PaywallModal
+        isOpen={showPaywallModal}
+        onClose={() => setShowPaywallModal(false)}
+        title={`Unlock All ${course.totalOriginalQuestions || ""} Questions`}
+        description={`Upgrade to Avero Pro to unlock all ${course.totalOriginalQuestions || "available"} questions in ${course.title || "this course"}, plus active-recall flashcards, study planner, and full exam simulations.`}
+      />
     </div>
   );
 }

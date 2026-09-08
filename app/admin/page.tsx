@@ -7,7 +7,6 @@ import {
   GraduationCap,
   BookOpen,
   FolderTree,
-  Sparkles,
   TrendingUp,
   UserCheck,
   Plus,
@@ -81,7 +80,7 @@ export default function AdminDashboardPage() {
               href="/admin/courses/new"
               className="px-5 py-2.5 bg-[#2866e1] hover:bg-[#1d52bf] text-white rounded-xl text-xs font-bold shadow-md shadow-[#2866e1]/20 flex items-center gap-2 transition cursor-pointer"
             >
-              <Sparkles className="w-4 h-4" />
+              <Plus className="w-4 h-4" />
               <span>New OCR Course</span>
             </Link>
           </div>
@@ -189,7 +188,7 @@ export default function AdminDashboardPage() {
               >
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-[#2866e1]/10 text-[#2866e1]">
-                    <Sparkles className="w-4 h-4" />
+                    <BookOpen className="w-4 h-4" />
                   </div>
                   <div>
                     <div className="font-bold text-slate-900 group-hover:text-[#2866e1]">

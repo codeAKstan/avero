@@ -38,7 +38,19 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { socialLinks, siteName, contactEmail, contactPhone, address, copyrightText } = body;
+    const {
+      socialLinks,
+      siteName,
+      contactEmail,
+      contactPhone,
+      address,
+      copyrightText,
+      isSubscriptionEnabled,
+      monthlyPriceNaira,
+      annualPriceNaira,
+      paystackMonthlyPlanCode,
+      paystackAnnualPlanCode,
+    } = body;
 
     await connectToDatabase();
 
@@ -65,6 +77,11 @@ export async function PUT(request: Request) {
     if (contactPhone !== undefined) settings.contactPhone = contactPhone.trim();
     if (address !== undefined) settings.address = address.trim();
     if (copyrightText !== undefined) settings.copyrightText = copyrightText.trim();
+    if (isSubscriptionEnabled !== undefined) settings.isSubscriptionEnabled = Boolean(isSubscriptionEnabled);
+    if (monthlyPriceNaira !== undefined) settings.monthlyPriceNaira = Number(monthlyPriceNaira);
+    if (annualPriceNaira !== undefined) settings.annualPriceNaira = Number(annualPriceNaira);
+    if (paystackMonthlyPlanCode !== undefined) settings.paystackMonthlyPlanCode = paystackMonthlyPlanCode.trim();
+    if (paystackAnnualPlanCode !== undefined) settings.paystackAnnualPlanCode = paystackAnnualPlanCode.trim();
 
     await settings.save();
 

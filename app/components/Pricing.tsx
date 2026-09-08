@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { Check } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, Loader2 } from "lucide-react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -9,6 +9,27 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 export function Pricing() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
+
+  const [monthlyPrice, setMonthlyPrice] = useState(5000);
+  const [annualPrice, setAnnualPrice] = useState(50000);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.settings) {
+          if (typeof data.settings.monthlyPriceNaira === "number") {
+            setMonthlyPrice(data.settings.monthlyPriceNaira);
+          }
+          if (typeof data.settings.annualPriceNaira === "number") {
+            setAnnualPrice(data.settings.annualPriceNaira);
+          }
+        }
+      })
+      .catch((err) => console.error("Error loading pricing settings:", err))
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -62,7 +83,7 @@ export function Pricing() {
             </div>
             <div className="flex items-baseline gap-1 mb-2">
               <span className="font-[family-name:var(--font-montserrat)] font-extrabold text-3xl sm:text-4xl text-slate-900">
-                $0
+                ₦0
               </span>
               <span className="text-slate-500 text-xs sm:text-sm font-medium">/ month</span>
             </div>
@@ -72,11 +93,10 @@ export function Pricing() {
 
             <div className="space-y-3 pt-5 sm:pt-6 border-t border-slate-100 mb-8">
               {[
-                "Access to core subjects",
-                "Basic answer explanations",
-                "Active recall practice sets",
+                "Access to free sample courses & past questions",
+                "Practice mode (up to free question limits)",
+                "Basic answer explanations & rationales",
                 "Standard progress tracking",
-                "Instructor rationales",
               ].map((feat) => (
                 <div key={feat} className="flex items-center gap-2.5 text-xs text-slate-700">
                   <div className="w-4 h-4 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
@@ -107,22 +127,31 @@ export function Pricing() {
               Pro Student
             </div>
             <div className="flex items-baseline gap-1 mb-2">
-              <span className="font-[family-name:var(--font-montserrat)] font-extrabold text-3xl sm:text-4xl text-slate-900">
-                $2
-              </span>
-              <span className="text-slate-500 text-xs sm:text-sm font-medium">/ month</span>
+              {loading ? (
+                <div className="h-10 flex items-center text-slate-400 text-xs">
+                  <Loader2 className="w-4 h-4 animate-spin mr-1.5" /> Loading price...
+                </div>
+              ) : (
+                <>
+                  <span className="font-[family-name:var(--font-montserrat)] font-extrabold text-3xl sm:text-4xl text-slate-900">
+                    ₦{monthlyPrice.toLocaleString()}
+                  </span>
+                  <span className="text-slate-500 text-xs sm:text-sm font-medium">/ month</span>
+                </>
+              )}
             </div>
             <p className="text-slate-500 text-xs mb-6">
-              Everything you need to master medical school & board exams.
+              Everything you need to master nursing council & board exams.
             </p>
 
             <div className="space-y-3 pt-5 sm:pt-6 border-t border-slate-100 mb-8">
               {[
                 "Everything on free",
-                "Targeted knowledge gap analytics",
-                "Unlimited quizzes",
-                "Study schedule",
-                "Daily notifications",
+                "100% Unlimited access to all past question banks",
+                "Save & bookmark questions for targeted revision",
+                "Full spaced-repetition active recall flashcards",
+                "Automated study schedule planner & reminders",
+                "Timed exam simulation mode with score reports",
               ].map((feat) => (
                 <div key={feat} className="flex items-center gap-2.5 text-xs text-slate-800 font-medium">
                   <div className="w-4 h-4 rounded-full bg-[#2866e1] text-white flex items-center justify-center shrink-0">
@@ -135,7 +164,7 @@ export function Pricing() {
           </div>
 
           <Link
-            href="/signup"
+            href="/pricing"
             className="w-full py-3.5 px-4 rounded-xl bg-[#2866e1] hover:bg-[#1d52bf] text-white font-semibold text-xs sm:text-sm text-center transition-all shadow-md shadow-[#2866e1]/25 block"
           >
             Upgrade to Pro

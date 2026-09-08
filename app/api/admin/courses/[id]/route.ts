@@ -58,6 +58,8 @@ export async function PATCH(
     if (body.modules) course.modules = body.modules;
     if (body.questions) course.questions = body.questions;
     if (typeof body.sourceDocumentUrl !== "undefined") course.sourceDocumentUrl = body.sourceDocumentUrl;
+    if (typeof body.isFreeAccess !== "undefined") course.isFreeAccess = Boolean(body.isFreeAccess);
+    if (typeof body.freeQuestionLimit === "number") course.freeQuestionLimit = body.freeQuestionLimit;
 
     await course.save();
 

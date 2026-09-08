@@ -16,6 +16,10 @@ import {
   Download,
   FileSpreadsheet,
   FileJson,
+  ChevronUp,
+  ChevronDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
 import { exportQuestionBankCSV, exportCoursesJSON } from "@/lib/exportUtils";
@@ -47,6 +51,10 @@ export default function EditCoursePage({
   const [passingScorePercentage, setPassingScorePercentage] = useState(75);
   const [allowedModes, setAllowedModes] = useState<("Practice" | "Exam")[]>(["Practice", "Exam"]);
 
+  // Freemium Access Controls
+  const [isFreeAccess, setIsFreeAccess] = useState(true);
+  const [freeQuestionLimit, setFreeQuestionLimit] = useState(5);
+
   // Modules & Questions
   const [modules, setModules] = useState<
     { title: string; content: string; order: number; estimatedMinutes: number }[]
@@ -55,6 +63,18 @@ export default function EditCoursePage({
   const [questions, setQuestions] = useState<
     { question: string; options: string[]; correctAnswer: string; explanation: string }[]
   >([]);
+
+  const scrollToTop = () => {
+    const main = document.querySelector("main");
+    if (main) main.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const scrollToBottom = () => {
+    const main = document.querySelector("main");
+    if (main) main.scrollTo({ top: main.scrollHeight, behavior: "smooth" });
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  };
 
   const handleExportCSV = () => {
     const currentCourse = {
@@ -123,6 +143,8 @@ export default function EditCoursePage({
           setAllowedModes(Array.isArray(c.allowedModes) && c.allowedModes.length > 0 ? c.allowedModes : ["Practice", "Exam"]);
           setModules(Array.isArray(c.modules) ? c.modules : []);
           setQuestions(Array.isArray(c.questions) ? c.questions : []);
+          if (typeof c.isFreeAccess !== "undefined") setIsFreeAccess(Boolean(c.isFreeAccess));
+          if (typeof c.freeQuestionLimit === "number") setFreeQuestionLimit(c.freeQuestionLimit);
         }
       })
       .catch((err) => console.error("Failed to load course", err))
@@ -181,6 +203,28 @@ export default function EditCoursePage({
     setQuestions((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const moveQuestionUp = (index: number) => {
+    if (index === 0) return;
+    setQuestions((prev) => {
+      const updated = [...prev];
+      const temp = updated[index - 1];
+      updated[index - 1] = updated[index];
+      updated[index] = temp;
+      return updated;
+    });
+  };
+
+  const moveQuestionDown = (index: number) => {
+    if (index === questions.length - 1) return;
+    setQuestions((prev) => {
+      const updated = [...prev];
+      const temp = updated[index + 1];
+      updated[index + 1] = updated[index];
+      updated[index] = temp;
+      return updated;
+    });
+  };
+
   // Modules handlers
   const addModule = () => {
     setModules((prev) => [
@@ -202,6 +246,28 @@ export default function EditCoursePage({
 
   const removeModule = (index: number) => {
     setModules((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const moveModuleUp = (index: number) => {
+    if (index === 0) return;
+    setModules((prev) => {
+      const updated = [...prev];
+      const temp = updated[index - 1];
+      updated[index - 1] = updated[index];
+      updated[index] = temp;
+      return updated.map((m, i) => ({ ...m, order: i + 1 }));
+    });
+  };
+
+  const moveModuleDown = (index: number) => {
+    if (index === modules.length - 1) return;
+    setModules((prev) => {
+      const updated = [...prev];
+      const temp = updated[index + 1];
+      updated[index + 1] = updated[index];
+      updated[index] = temp;
+      return updated.map((m, i) => ({ ...m, order: i + 1 }));
+    });
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -230,6 +296,8 @@ export default function EditCoursePage({
           allowedModes,
           modules,
           questions,
+          isFreeAccess,
+          freeQuestionLimit,
         }),
       });
 
@@ -444,6 +512,48 @@ export default function EditCoursePage({
               </label>
             </div>
           </div>
+
+          {/* Freemium Access & Question Limit Controls */}
+          <div className="sm:col-span-2 p-4 bg-blue-50/60 border border-blue-200/80 rounded-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  🔒 Freemium Student Access Controls
+                </h4>
+                <p className="text-[11px] text-slate-500">
+                  Control whether free users can practice this course and how many questions they can view before being prompted to upgrade to Pro.
+                </p>
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-blue-200 rounded-xl">
+                <input
+                  type="checkbox"
+                  checked={isFreeAccess}
+                  onChange={(e) => setIsFreeAccess(e.target.checked)}
+                  className="w-4 h-4 text-[#2866e1] rounded border-slate-300"
+                />
+                <span className="text-xs font-bold text-slate-800">Allow Free Access</span>
+              </label>
+            </div>
+
+            {isFreeAccess && (
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Free Student Question Limit
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  max={questions.length || 500}
+                  value={freeQuestionLimit}
+                  onChange={(e) => setFreeQuestionLimit(parseInt(e.target.value, 10) || 0)}
+                  className="w-full max-w-xs p-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-900"
+                />
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Free users will be able to solve up to <strong className="text-slate-900">{freeQuestionLimit} questions</strong> in this course. Question #{freeQuestionLimit + 1} onwards will require a Pro membership.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Description */}
@@ -520,14 +630,35 @@ export default function EditCoursePage({
                     <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
                       Question #{qIdx + 1}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => removeQuestion(qIdx)}
-                      className="text-slate-400 hover:text-rose-600 transition"
-                      title="Delete Question"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => moveQuestionUp(qIdx)}
+                        disabled={qIdx === 0}
+                        className="p-1.5 text-slate-500 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Move Question Up"
+                      >
+                        <ChevronUp className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveQuestionDown(qIdx)}
+                        disabled={qIdx === questions.length - 1}
+                        className="p-1.5 text-slate-500 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Move Question Down"
+                      >
+                        <ChevronDown className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeQuestion(qIdx)}
+                        className="p-1.5 text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition cursor-pointer"
+                        title="Delete Question"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
                   <div>
@@ -618,13 +749,35 @@ export default function EditCoursePage({
                   <span className="text-xs font-bold text-[#2866e1] uppercase tracking-wider">
                     Lesson {index + 1}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => removeModule(index)}
-                    className="text-slate-400 hover:text-rose-600 transition"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => moveModuleUp(index)}
+                      disabled={index === 0}
+                      className="p-1.5 text-slate-500 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                      title="Move Module Up"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moveModuleDown(index)}
+                      disabled={index === modules.length - 1}
+                      className="p-1.5 text-slate-500 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                      title="Move Module Down"
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeModule(index)}
+                      className="p-1.5 text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition cursor-pointer"
+                      title="Delete Module"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
@@ -690,6 +843,40 @@ export default function EditCoursePage({
           </button>
         </div>
       </form>
+
+      {/* Floating Page Navigation & Quick Save Widget */}
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 p-2 rounded-2xl shadow-2xl text-white">
+        <button
+          type="button"
+          onClick={scrollToTop}
+          className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl transition cursor-pointer"
+          title="Scroll to Top"
+        >
+          <ArrowUp className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={scrollToBottom}
+          className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl transition cursor-pointer"
+          title="Scroll to Bottom"
+        >
+          <ArrowDown className="w-4 h-4" />
+        </button>
+        <div className="h-5 w-px bg-slate-700 mx-1" />
+        <button
+          type="button"
+          onClick={(e) => handleSave(e)}
+          disabled={saving}
+          className="px-4 py-2.5 bg-[#2866e1] hover:bg-[#1d52bf] text-white font-extrabold text-xs rounded-xl shadow-md flex items-center gap-2 transition cursor-pointer disabled:opacity-50"
+        >
+          {saving ? (
+            <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+          ) : (
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+          )}
+          <span>Save Course</span>
+        </button>
+      </div>
     </div>
   );
 }

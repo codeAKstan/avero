@@ -14,11 +14,12 @@ import {
   Send,
   Loader2,
   BookOpen,
-  Sparkles,
   AlertTriangle,
   Bookmark,
 } from "lucide-react";
 import { shuffleArray } from "@/lib/utils";
+
+import PaywallModal from "@/components/PaywallModal";
 
 export default function StudentExamRunnerPage({
   params,
@@ -39,6 +40,8 @@ export default function StudentExamRunnerPage({
   const [bookmarked, setBookmarked] = useState<{ [key: number]: boolean }>({});
   const [submitting, setSubmitting] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showPaywallModal, setShowPaywallModal] = useState(false);
+  const [paywallTitle, setPaywallTitle] = useState("Unlock Avero Pro Membership");
 
   // Timer states
   const [secondsRemaining, setSecondsRemaining] = useState<number>(0);
@@ -49,10 +52,8 @@ export default function StudentExamRunnerPage({
     const q = course.questions[index];
     const newBookmarkedState = !bookmarked[index];
 
-    setBookmarked((prev) => ({ ...prev, [index]: newBookmarkedState }));
-
     try {
-      await fetch("/api/user/bookmarks", {
+      const res = await fetch("/api/user/bookmarks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -64,6 +65,17 @@ export default function StudentExamRunnerPage({
           explanation: q.explanation || "",
         }),
       });
+
+      const data = await res.json();
+      if (res.status === 403 && data.code === "PRO_REQUIRED") {
+        setPaywallTitle("Bookmarking Questions Requires Pro");
+        setShowPaywallModal(true);
+        return;
+      }
+
+      if (data.success) {
+        setBookmarked((prev) => ({ ...prev, [index]: newBookmarkedState }));
+      }
     } catch (err) {
       console.error("Error toggling bookmark:", err);
     }
@@ -509,6 +521,14 @@ export default function StudentExamRunnerPage({
           </div>
         </div>
       )}
+
+      {/* Pro Subscription Paywall Modal */}
+      <PaywallModal
+        isOpen={showPaywallModal}
+        onClose={() => setShowPaywallModal(false)}
+        title={paywallTitle}
+        description="Upgrade your account to Avero Pro to unlock unlimited past questions, bookmarks, flashcards, and exam simulations."
+      />
     </div>
   );
 }

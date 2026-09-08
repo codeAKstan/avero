@@ -22,6 +22,13 @@ export interface IUser extends Document {
   lastAdvanceReminderSentDate?: Date;
   isOnboarded: boolean;
   isSuspended?: boolean;
+  subscriptionPlan?: "free" | "pro";
+  subscriptionStatus?: "active" | "canceled" | "past_due" | null;
+  paystackCustomerCode?: string;
+  paystackSubscriptionCode?: string;
+  subscriptionExpiresAt?: Date;
+  lastExpiringNoticeSentDate?: Date;
+  lastExpiredNoticeSentDate?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -113,6 +120,33 @@ const UserSchema: Schema<IUser> = new Schema(
     isSuspended: {
       type: Boolean,
       default: false,
+    },
+    subscriptionPlan: {
+      type: String,
+      enum: ["free", "pro"],
+      default: "free",
+    },
+    subscriptionStatus: {
+      type: String,
+      enum: ["active", "canceled", "past_due", null],
+      default: null,
+    },
+    paystackCustomerCode: {
+      type: String,
+      default: "",
+    },
+    paystackSubscriptionCode: {
+      type: String,
+      default: "",
+    },
+    subscriptionExpiresAt: {
+      type: Date,
+    },
+    lastExpiringNoticeSentDate: {
+      type: Date,
+    },
+    lastExpiredNoticeSentDate: {
+      type: Date,
     },
   },
   {
