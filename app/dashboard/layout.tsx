@@ -62,6 +62,7 @@ export default function StudentDashboardLayout({
   const navItems = [
     { label: "Dashboard Overview", href: "/dashboard", icon: LayoutDashboard },
     { label: "Courses & Test Banks", href: "/dashboard/courses", icon: BookOpen },
+    { label: "Practical Questions", href: "/dashboard/practicals", icon: GraduationCap, isProOnly: true },
     { label: "Active Flashcards (SM-2)", href: "/dashboard/flashcards", icon: Brain },
     { label: "Saved Questions", href: "/dashboard/bookmarks", icon: Bookmark },
     { label: "Study Schedule Planner", href: "/dashboard/schedule", icon: Calendar },
@@ -152,6 +153,11 @@ export default function StudentDashboardLayout({
                     }`}
                   />
                   <span>{item.label}</span>
+                  {item.isProOnly && (
+                    <span className="px-1.5 py-0.5 bg-amber-500 text-white rounded text-[8px] font-black uppercase tracking-wider">
+                      PRO
+                    </span>
+                  )}
                 </div>
                 {isActive && <ChevronRight className="w-3.5 h-3.5 text-[#2866e1]" />}
               </Link>

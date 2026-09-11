@@ -61,7 +61,16 @@ export default function EditCoursePage({
   >([]);
 
   const [questions, setQuestions] = useState<
-    { question: string; options: string[]; correctAnswer: string; explanation: string }[]
+    {
+      question: string;
+      options: string[];
+      correctAnswer: string;
+      explanation: string;
+      questionType?: "standard" | "practical";
+      practicalTitle?: string;
+      flashcardImageUrl?: string;
+      markingSchemeImageUrl?: string;
+    }[]
   >([]);
 
   const scrollToTop = () => {
@@ -165,7 +174,7 @@ export default function EditCoursePage({
   };
 
   // Questions handlers
-  const addQuestion = () => {
+  const addQuestion = (type: "standard" | "practical" = "standard") => {
     setQuestions((prev) => [
       ...prev,
       {
@@ -173,6 +182,10 @@ export default function EditCoursePage({
         options: ["A. Option 1", "B. Option 2", "C. Option 3", "D. Option 4"],
         correctAnswer: "A. Option 1",
         explanation: "Clinical rationale explaining why this option is correct.",
+        questionType: type,
+        practicalTitle: type === "practical" ? "Bed Making Procedure" : "",
+        flashcardImageUrl: "",
+        markingSchemeImageUrl: "",
       },
     ]);
   };
@@ -609,27 +622,46 @@ export default function EditCoursePage({
               </h3>
               <p className="text-xs text-slate-500">View, edit, add options, and update rationales for test items.</p>
             </div>
-            <button
-              type="button"
-              onClick={addQuestion}
-              className="w-full sm:w-auto px-3.5 py-2 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 text-emerald-800 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5 shrink-0" /> Add Question
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => addQuestion("standard")}
+                className="px-3.5 py-2 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 text-emerald-800 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5 shrink-0" /> Add Standard Question
+              </button>
+              <button
+                type="button"
+                onClick={() => addQuestion("practical")}
+                className="px-3.5 py-2 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 text-indigo-800 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5 shrink-0" /> Add Practical Module
+              </button>
+            </div>
           </div>
 
           {questions.length === 0 ? (
             <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-xl text-slate-500 text-xs">
-              No questions found in this question bank. Click "Add Question" above to create one.
+              No questions found in this question bank. Click "Add Standard Question" or "Add Practical Module" above to create one.
             </div>
           ) : (
             <div className="space-y-6">
               {questions.map((q, qIdx) => (
-                <div key={qIdx} className="p-4 sm:p-5 bg-slate-50/80 border border-slate-200 rounded-xl space-y-4 shadow-xs overflow-hidden">
+                <div key={qIdx} className={`p-4 sm:p-5 border rounded-xl space-y-4 shadow-xs overflow-hidden ${q.questionType === "practical" ? "bg-indigo-50/40 border-indigo-200" : "bg-slate-50/80 border-slate-200"}`}>
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
-                      Question #{qIdx + 1}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-bold uppercase tracking-wider ${q.questionType === "practical" ? "text-indigo-700" : "text-emerald-700"}`}>
+                        Question #{qIdx + 1}
+                      </span>
+                      <select
+                        value={q.questionType || "standard"}
+                        onChange={(e) => updateQuestion(qIdx, "questionType", e.target.value)}
+                        className="text-xs font-bold px-2 py-1 bg-white border border-slate-300 rounded-lg outline-none cursor-pointer"
+                      >
+                        <option value="standard">Standard MCQ</option>
+                        <option value="practical">Practical Module</option>
+                      </select>
+                    </div>
 
                     <div className="flex items-center gap-1">
                       <button
@@ -660,6 +692,92 @@ export default function EditCoursePage({
                       </button>
                     </div>
                   </div>
+
+                  {q.questionType === "practical" && (
+                    <div className="p-4 bg-white border border-indigo-100 rounded-xl space-y-4">
+                      <div className="text-xs font-bold text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
+                        <BookOpen className="w-4 h-4 text-indigo-600" />
+                        Practical Module Setup (Flashcard, Markings & Question OCR)
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Practical Procedure Title</label>
+                        <input
+                          type="text"
+                          value={q.practicalTitle || ""}
+                          onChange={(e) => updateQuestion(qIdx, "practicalTitle", e.target.value)}
+                          placeholder="e.g. Bed Making Procedure, Sterile Dressing Change"
+                          className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-900"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Field 1: Practical Flashcard Image */}
+                        <div className="p-3 bg-indigo-50/50 border border-indigo-200/60 rounded-xl space-y-2">
+                          <label className="block text-xs font-bold text-indigo-900">
+                            Field 1: Flashcard Explanatory Image (Purpose, Equipment, Steps)
+                          </label>
+                          {q.flashcardImageUrl ? (
+                            <div className="relative group">
+                              <img src={q.flashcardImageUrl} alt="Flashcard Image" className="w-full h-32 object-cover rounded-lg border border-slate-200" />
+                              <button
+                                type="button"
+                                onClick={() => updateQuestion(qIdx, "flashcardImageUrl", "")}
+                                className="absolute top-2 right-2 p-1 bg-rose-600 text-white rounded-md text-[10px] font-bold"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          ) : (
+                            <UploadButton
+                              endpoint="imageUploader"
+                              onClientUploadComplete={(res) => {
+                                if (res && res[0]) {
+                                  updateQuestion(qIdx, "flashcardImageUrl", res[0].ufsUrl || res[0].url);
+                                }
+                              }}
+                              onUploadError={(err) => alert(`Upload Error: ${err.message}`)}
+                              appearance={{
+                                button: "bg-indigo-600 text-white text-xs font-bold py-1.5 px-3 rounded-lg cursor-pointer w-full",
+                              }}
+                            />
+                          )}
+                        </div>
+
+                        {/* Field 2: Markings Allocation Image */}
+                        <div className="p-3 bg-amber-50/50 border border-amber-200/60 rounded-xl space-y-2">
+                          <label className="block text-xs font-bold text-amber-900">
+                            Field 2: Markings Allocation / Rubric Sheet Image
+                          </label>
+                          {q.markingSchemeImageUrl ? (
+                            <div className="relative group">
+                              <img src={q.markingSchemeImageUrl} alt="Marking Scheme" className="w-full h-32 object-cover rounded-lg border border-slate-200" />
+                              <button
+                                type="button"
+                                onClick={() => updateQuestion(qIdx, "markingSchemeImageUrl", "")}
+                                className="absolute top-2 right-2 p-1 bg-rose-600 text-white rounded-md text-[10px] font-bold"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          ) : (
+                            <UploadButton
+                              endpoint="imageUploader"
+                              onClientUploadComplete={(res) => {
+                                if (res && res[0]) {
+                                  updateQuestion(qIdx, "markingSchemeImageUrl", res[0].ufsUrl || res[0].url);
+                                }
+                              }}
+                              onUploadError={(err) => alert(`Upload Error: ${err.message}`)}
+                              appearance={{
+                                button: "bg-amber-600 text-white text-xs font-bold py-1.5 px-3 rounded-lg cursor-pointer w-full",
+                              }}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">Question Prompt</label>

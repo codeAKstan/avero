@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { WhatsAppWidget } from "./components/WhatsAppWidget";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -130,6 +131,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-[#f5f8ff] bg-dot-pattern text-[#0f172a] font-[family-name:var(--font-montserrat)]">
         {children}
+        <WhatsAppWidget />
       </body>
     </html>
   );

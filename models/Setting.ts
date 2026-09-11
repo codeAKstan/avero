@@ -41,7 +41,7 @@ const SettingSchema: Schema<ISetting> = new Schema(
       instagram: { type: String, default: "https://instagram.com" },
       linkedin: { type: String, default: "https://linkedin.com" },
       youtube: { type: String, default: "https://youtube.com" },
-      whatsapp: { type: String, default: "" },
+      whatsapp: { type: String, default: "https://whatsapp.com/channel/0029VbDr8yt2v1IyMZy0oO3V" },
       tiktok: { type: String, default: "" },
       telegram: { type: String, default: "" },
     },

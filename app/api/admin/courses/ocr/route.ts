@@ -4,7 +4,7 @@ import { GoogleGenAI } from "@google/genai";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { documentUrl, rawText, fileType } = body;
+    const { documentUrl, rawText, fileType, isPractical, practicalTitle } = body;
 
     if (!documentUrl && !rawText) {
       return NextResponse.json(
@@ -132,6 +132,14 @@ JSON format:
         ],
         questions: [],
       };
+    }
+
+    if (isPractical && Array.isArray(parsedCourse.questions)) {
+      parsedCourse.questions = parsedCourse.questions.map((q: any) => ({
+        ...q,
+        questionType: "practical",
+        practicalTitle: practicalTitle || parsedCourse.title || "Practical Module",
+      }));
     }
 
     return NextResponse.json({

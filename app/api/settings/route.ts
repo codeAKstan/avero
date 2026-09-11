@@ -14,7 +14,10 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       settings: {
-        socialLinks: settings.socialLinks,
+        socialLinks: {
+          ...settings.socialLinks,
+          whatsapp: settings.socialLinks?.whatsapp || "https://whatsapp.com/channel/0029VbDr8yt2v1IyMZy0oO3V",
+        },
         siteName: settings.siteName,
         contactEmail: settings.contactEmail,
         contactPhone: settings.contactPhone,
@@ -37,7 +40,7 @@ export async function GET() {
           instagram: "https://instagram.com",
           linkedin: "https://linkedin.com",
           youtube: "https://youtube.com",
-          whatsapp: "",
+          whatsapp: "https://whatsapp.com/channel/0029VbDr8yt2v1IyMZy0oO3V",
           tiktok: "",
           telegram: "",
         },

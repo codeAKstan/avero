@@ -15,6 +15,10 @@ export interface IQuestion {
   options: string[];
   correctAnswer: string;
   explanation?: string;
+  questionType?: "standard" | "practical";
+  practicalTitle?: string;
+  flashcardImageUrl?: string;
+  markingSchemeImageUrl?: string;
 }
 
 export interface ICourse extends Document {
@@ -50,6 +54,10 @@ const QuestionSchema = new Schema<IQuestion>({
   options: [{ type: String, required: true }],
   correctAnswer: { type: String, required: true, trim: true },
   explanation: { type: String, default: "" },
+  questionType: { type: String, enum: ["standard", "practical"], default: "standard" },
+  practicalTitle: { type: String, default: "" },
+  flashcardImageUrl: { type: String, default: "" },
+  markingSchemeImageUrl: { type: String, default: "" },
 });
 
 const CourseSchema: Schema<ICourse> = new Schema(

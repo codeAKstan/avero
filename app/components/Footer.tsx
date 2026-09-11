@@ -17,7 +17,7 @@ export function Footer() {
     instagram: "https://instagram.com",
     linkedin: "https://linkedin.com",
     youtube: "https://youtube.com",
-    whatsapp: "",
+    whatsapp: "https://whatsapp.com/channel/0029VbDr8yt2v1IyMZy0oO3V",
     tiktok: "",
     telegram: "",
   });
