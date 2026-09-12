@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
+import mammoth from "mammoth";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { documentUrl, rawText, fileType, isPractical, practicalTitle } = body;
+    const { documentUrl, fileName, rawText, fileType, isPractical, practicalTitle } = body;
 
     if (!documentUrl && !rawText) {
       return NextResponse.json(
@@ -62,45 +63,111 @@ JSON format:
     if (documentUrl) {
       try {
         const fileRes = await fetch(documentUrl);
+        const contentTypeHeader = fileRes.headers.get("content-type") || "";
         const arrayBuffer = await fileRes.arrayBuffer();
-        const base64Data = Buffer.from(arrayBuffer).toString("base64");
-        
-        let mimeType = "application/pdf";
-        if (fileType?.includes("image") || documentUrl.match(/\.(png|jpe?g|webp)$/i)) {
-          mimeType = fileType || "image/jpeg";
-        } else if (fileType?.includes("pdf") || documentUrl.match(/\.pdf$/i)) {
-          mimeType = "application/pdf";
-        }
+        const buffer = Buffer.from(arrayBuffer);
 
-        promptContents = [
-          systemPrompt,
-          "Extract all questions, multiple-choice options, correct answers, and exact verbatim rationales (do NOT edit, change, or summarize the rationales):",
-          {
-            inlineData: {
-              mimeType,
-              data: base64Data,
+        // Check magic bytes
+        const isZipDocxHeader =
+          buffer.length >= 4 &&
+          buffer[0] === 0x50 &&
+          buffer[1] === 0x4b &&
+          buffer[2] === 0x03 &&
+          buffer[3] === 0x04;
+        
+        const isPdfHeader =
+          buffer.length >= 4 &&
+          buffer[0] === 0x25 &&
+          buffer[1] === 0x50 &&
+          buffer[2] === 0x44 &&
+          buffer[3] === 0x46;
+
+        const isPngHeader =
+          buffer.length >= 4 &&
+          buffer[0] === 0x89 &&
+          buffer[1] === 0x50 &&
+          buffer[2] === 0x4e &&
+          buffer[3] === 0x47;
+
+        const isJpegHeader =
+          buffer.length >= 3 &&
+          buffer[0] === 0xff &&
+          buffer[1] === 0xd8 &&
+          buffer[2] === 0xff;
+
+        const isDocx =
+          isZipDocxHeader ||
+          contentTypeHeader.includes("wordprocessingml") ||
+          contentTypeHeader.includes("msword") ||
+          contentTypeHeader.includes("officedocument") ||
+          fileType?.includes("wordprocessingml") ||
+          fileType?.includes("msword") ||
+          fileType?.includes("officedocument") ||
+          documentUrl.match(/\.(docx?)$/i) ||
+          fileName?.match(/\.(docx?)$/i);
+
+        if (isDocx) {
+          try {
+            const result = await mammoth.extractRawText({ buffer });
+            const docxText = result.value;
+            promptContents = [
+              `Extract past questions JSON from this uploaded DOCX document text (do NOT edit, change, or summarize rationales; extract them exact and verbatim):\n\n${docxText}`,
+            ];
+          } catch (mammothErr) {
+            console.warn("Mammoth failed to parse docx, fallbacking to plain text extraction:", mammothErr);
+            const rawTxt = buffer.toString("utf-8");
+            promptContents = [
+              `Extract past questions JSON from this document text:\n\n${rawTxt}`,
+            ];
+          }
+        } else if (isPdfHeader || contentTypeHeader.includes("pdf") || fileType?.includes("pdf") || documentUrl.match(/\.pdf$/i) || fileName?.match(/\.pdf$/i)) {
+          const base64Data = buffer.toString("base64");
+          promptContents = [
+            {
+              inlineData: {
+                mimeType: "application/pdf",
+                data: base64Data,
+              },
             },
-          },
-        ];
+            "Extract all past exam questions, multiple-choice options, correct answers, and exact verbatim rationales into JSON format:",
+          ];
+        } else if (isPngHeader || isJpegHeader || contentTypeHeader.includes("image") || fileType?.includes("image") || documentUrl.match(/\.(png|jpe?g|webp)$/i) || fileName?.match(/\.(png|jpe?g|webp)$/i)) {
+          const base64Data = buffer.toString("base64");
+          const mimeType = isPngHeader ? "image/png" : isJpegHeader ? "image/jpeg" : fileType || "image/jpeg";
+          promptContents = [
+            {
+              inlineData: {
+                mimeType,
+                data: base64Data,
+              },
+            },
+            "Extract all past exam questions, multiple-choice options, correct answers, and exact verbatim rationales into JSON format:",
+          ];
+        } else {
+          // Plain text fallback
+          const txt = buffer.toString("utf-8");
+          promptContents = [
+            `Extract past questions JSON from this text (do NOT edit, change, or summarize rationales; extract them exact and verbatim):\n\n${txt}`,
+          ];
+        }
       } catch (fetchErr) {
         console.error("Failed to fetch uploaded document URL for OCR:", fetchErr);
         promptContents = [
-          systemPrompt,
           `Analyze document URL (${documentUrl}) and convert into past questions JSON with exact verbatim rationales.`,
         ];
       }
     } else {
       promptContents = [
-        systemPrompt,
         `Extract past questions JSON from text (do NOT edit, change, or summarize rationales; extract them exact and verbatim):\n\n${rawText}`,
       ];
     }
 
-    // Call Gemini 3.6 Flash with responseMimeType JSON & temperature 0.2 for max speed
+    // Call Gemini 3.6 Flash with systemInstruction in config, responseMimeType JSON & temperature 0.2 for max speed
     const response = await ai.models.generateContent({
       model: "gemini-3.6-flash",
       contents: promptContents,
       config: {
+        systemInstruction: systemPrompt,
         responseMimeType: "application/json",
         temperature: 0.2,
       },

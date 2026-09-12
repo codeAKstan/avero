@@ -19,11 +19,13 @@ import {
   Download,
   FileSpreadsheet,
   FileJson,
+  FileText,
   ChevronDown,
 } from "lucide-react";
 import {
   exportCoursesSummaryCSV,
   exportQuestionBankCSV,
+  exportQuestionBankDOCX,
   exportCoursesJSON,
 } from "@/lib/exportUtils";
 
@@ -221,6 +223,21 @@ export default function CourseManagementPage() {
                   <button
                     type="button"
                     onClick={() => {
+                      exportQuestionBankDOCX(courses);
+                      setIsExportMenuOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-2.5 hover:bg-slate-50 rounded-lg font-medium text-slate-700 flex items-center gap-2.5 cursor-pointer transition"
+                  >
+                    <FileText className="w-4 h-4 text-[#2866e1] shrink-0" />
+                    <div>
+                      <div className="font-bold text-slate-900">Word Document (DOCX)</div>
+                      <div className="text-[10px] text-slate-500">Formatted Word doc with test bank & rationales</div>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
                       exportCoursesJSON(courses);
                       setIsExportMenuOpen(false);
                     }}
@@ -397,11 +414,19 @@ export default function CourseManagementPage() {
                       <div className="flex items-center justify-end gap-2">
                         <button
                           type="button"
+                          onClick={() => exportQuestionBankDOCX([course])}
+                          className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-[#2866e1] border border-blue-200 rounded-lg text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer"
+                          title="Export Question Bank DOCX Word Document"
+                        >
+                          <FileText className="w-3.5 h-3.5" /> DOCX
+                        </button>
+                        <button
+                          type="button"
                           onClick={() => exportQuestionBankCSV([course])}
                           className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer"
                           title="Export Question Bank CSV with Rationales"
                         >
-                          <Download className="w-3.5 h-3.5" /> Export
+                          <Download className="w-3.5 h-3.5" /> CSV
                         </button>
                         <Link
                           href={`/admin/courses/${course._id}`}

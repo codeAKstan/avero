@@ -30,11 +30,12 @@ export const ourFileRouter = {
       return { uploadedBy: metadata.adminId, url: fileUrl, ufsUrl: fileUrl };
     }),
 
-  // Document uploader for OCR AI extraction (PDF, DOCX, TXT)
+  // Document uploader for OCR AI extraction (PDF, DOCX, TXT, Images)
   documentUploader: f({
     pdf: { maxFileSize: "16MB", maxFileCount: 1 },
     text: { maxFileSize: "8MB", maxFileCount: 1 },
     image: { maxFileSize: "16MB", maxFileCount: 1 },
+    blob: { maxFileSize: "16MB", maxFileCount: 1 },
   })
     .middleware(async () => {
       const cookieStore = await cookies();

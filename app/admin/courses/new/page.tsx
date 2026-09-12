@@ -136,6 +136,7 @@ export default function NewCoursePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           documentUrl: uploadedDocUrl,
+          fileName: uploadedDocName,
           rawText: rawTextInput,
           isPractical: courseQuestionType === "practical",
           practicalTitle: practicalTitle || title,
@@ -514,7 +515,7 @@ export default function NewCoursePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* UploadThing Document Dropzone */}
             <div className="bg-[#f5f8ff] border border-slate-200/80 rounded-xl p-4 flex flex-col items-center justify-center overflow-hidden">
-              <span className="text-xs font-bold text-slate-700 mb-3 text-center">Option A: Upload File (PDF / Image)</span>
+              <span className="text-xs font-bold text-slate-700 mb-3 text-center">Option A: Upload File (PDF / DOCX / Image)</span>
               
               <div className="w-full overflow-hidden">
                 <UploadDropzone

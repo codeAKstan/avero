@@ -22,7 +22,7 @@ import {
   ArrowDown,
 } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
-import { exportQuestionBankCSV, exportCoursesJSON } from "@/lib/exportUtils";
+import { exportQuestionBankCSV, exportCoursesJSON, exportQuestionBankDOCX } from "@/lib/exportUtils";
 
 export default function EditCoursePage({
   params,
@@ -123,6 +123,26 @@ export default function EditCoursePage({
       createdAt: new Date().toISOString(),
     };
     exportCoursesJSON([currentCourse]);
+  };
+
+  const handleExportDOCX = () => {
+    const currentCourse = {
+      _id: id,
+      title: title || "Untitled Course",
+      slug,
+      category: selectedCategory?.name || "Uncategorized",
+      subcategoryName,
+      description,
+      level,
+      status,
+      timeLimitMinutes,
+      passingScorePercentage,
+      allowedModes,
+      modules,
+      questions,
+      createdAt: new Date().toISOString(),
+    };
+    exportQuestionBankDOCX([currentCourse]);
   };
 
   useEffect(() => {
@@ -360,6 +380,15 @@ export default function EditCoursePage({
           </h1>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleExportDOCX}
+              className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-[#2866e1] border border-blue-200 text-xs font-bold rounded-xl flex items-center gap-1.5 transition cursor-pointer"
+              title="Export Test Bank & Rationales to Word (.docx)"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>Export DOCX</span>
+            </button>
             <button
               type="button"
               onClick={handleExportCSV}
