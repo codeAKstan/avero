@@ -43,18 +43,22 @@ export async function GET(request: Request) {
             courseId: course._id,
             courseTitle: course.title,
             category: course.categoryId?.name || "Nursing Practical",
-            flashcardImageUrl: q.flashcardImageUrl || "",
-            markingSchemeImageUrl: q.markingSchemeImageUrl || "",
+            flashcardImageUrl: isPro ? (q.flashcardImageUrl || "") : "",
+            markingSchemeImageUrl: isPro ? (q.markingSchemeImageUrl || "") : "",
             questions: [],
+            questionsCount: 0,
           };
         }
-        if (!grouped[titleKey].flashcardImageUrl && q.flashcardImageUrl) {
-          grouped[titleKey].flashcardImageUrl = q.flashcardImageUrl;
+        if (isPro) {
+          if (!grouped[titleKey].flashcardImageUrl && q.flashcardImageUrl) {
+            grouped[titleKey].flashcardImageUrl = q.flashcardImageUrl;
+          }
+          if (!grouped[titleKey].markingSchemeImageUrl && q.markingSchemeImageUrl) {
+            grouped[titleKey].markingSchemeImageUrl = q.markingSchemeImageUrl;
+          }
+          grouped[titleKey].questions.push(q);
         }
-        if (!grouped[titleKey].markingSchemeImageUrl && q.markingSchemeImageUrl) {
-          grouped[titleKey].markingSchemeImageUrl = q.markingSchemeImageUrl;
-        }
-        grouped[titleKey].questions.push(q);
+        grouped[titleKey].questionsCount += 1;
       });
 
       Object.values(grouped).forEach((mod) => {

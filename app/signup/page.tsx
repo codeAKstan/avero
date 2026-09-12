@@ -194,11 +194,6 @@ export default function SignupPage() {
           {/* Social Google Signup Button */}
           <button
             type="button"
-            onClick={() => {
-              setFullName("Google Student");
-              setEmail("student@gmail.com");
-              setStep(2);
-            }}
             className="w-full py-2.5 sm:py-3 px-4 rounded-xl border border-slate-200 hover:bg-slate-50 font-semibold text-slate-700 text-xs sm:text-sm flex items-center justify-center gap-3 transition-colors shadow-sm mb-5"
           >
             <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24">

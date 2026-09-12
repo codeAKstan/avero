@@ -33,10 +33,16 @@ export default function PracticalQuestionsPage() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          setIsPro(Boolean(data.isPro));
+          const userIsPro = Boolean(data.isPro);
+          setIsPro(userIsPro);
           setPracticalModules(data.practicalModules || []);
-          if (data.practicalModules && data.practicalModules.length > 0) {
+          if (userIsPro && data.practicalModules && data.practicalModules.length > 0) {
             setSelectedModule(data.practicalModules[0]);
+          } else {
+            setSelectedModule(null);
+            if (!userIsPro) {
+              setShowPaywall(true);
+            }
           }
         }
       })
@@ -191,7 +197,7 @@ export default function PracticalQuestionsPage() {
                     </div>
 
                     <div className="mt-3 pt-3 border-t border-current/10 flex items-center justify-between text-[11px] font-semibold opacity-90">
-                      <span>{mod.questions.length} Questions</span>
+                      <span>{mod.questionsCount || mod.questions?.length || 0} Questions</span>
                       <span className="flex items-center gap-1">
                         <Sparkles className="w-3 h-3" />
                         OCR Parsed
@@ -205,7 +211,28 @@ export default function PracticalQuestionsPage() {
 
           {/* Practical Viewer (Right Side) */}
           <div className="lg:col-span-8">
-            {selectedModule && (
+            {!isPro ? (
+              <div className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-12 text-center space-y-6 shadow-xs flex flex-col items-center justify-center min-h-[450px]">
+                <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 shadow-inner">
+                  <Lock className="w-8 h-8" />
+                </div>
+                <div className="max-w-md space-y-2">
+                  <h3 className="text-xl font-extrabold text-slate-900">
+                    Practical Question Banks are Locked
+                  </h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    Upgrade to Avero Pro to unlock procedure flashcard guides, marking scheme allocation sheets, and interactive OSCE practical exam questions.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowPaywall(true)}
+                  className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>Upgrade to Avero Pro</span>
+                </button>
+              </div>
+            ) : selectedModule ? (
               <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 space-y-6 shadow-xs">
                 {/* Header & Tabs */}
                 <div className="space-y-4 pb-4 border-b border-slate-100">
@@ -477,7 +504,7 @@ export default function PracticalQuestionsPage() {
                   </div>
                 )}
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       )}
