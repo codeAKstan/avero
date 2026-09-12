@@ -4,6 +4,8 @@ import "./Course";
 
 export interface IAttemptAnswer {
   questionId?: string;
+  courseId?: string;
+  courseTitle?: string;
   questionText: string;
   userChoice: string;
   correctChoice: string;
@@ -11,9 +13,20 @@ export interface IAttemptAnswer {
   explanation?: string;
 }
 
+export interface ISubjectBreakdown {
+  courseId?: string;
+  courseTitle: string;
+  totalQuestions: number;
+  correctCount: number;
+  score: number;
+}
+
 export interface IExamAttempt extends Document {
   userId: Types.ObjectId;
-  courseId: Types.ObjectId;
+  courseId?: Types.ObjectId;
+  isMockExam?: boolean;
+  paperTitle?: string;
+  subjectBreakdown?: ISubjectBreakdown[];
   score: number;
   totalQuestions: number;
   correctCount: number;
@@ -27,11 +40,21 @@ export interface IExamAttempt extends Document {
 
 const AttemptAnswerSchema = new Schema<IAttemptAnswer>({
   questionId: { type: String },
+  courseId: { type: String },
+  courseTitle: { type: String },
   questionText: { type: String, required: true },
   userChoice: { type: String, default: "" },
   correctChoice: { type: String, required: true },
   isCorrect: { type: Boolean, required: true },
   explanation: { type: String, default: "" },
+});
+
+const SubjectBreakdownSchema = new Schema<ISubjectBreakdown>({
+  courseId: { type: String },
+  courseTitle: { type: String, required: true },
+  totalQuestions: { type: Number, required: true },
+  correctCount: { type: Number, required: true },
+  score: { type: Number, required: true },
 });
 
 const ExamAttemptSchema: Schema<IExamAttempt> = new Schema(
@@ -44,8 +67,17 @@ const ExamAttemptSchema: Schema<IExamAttempt> = new Schema(
     courseId: {
       type: Schema.Types.ObjectId,
       ref: "Course",
-      required: true,
+      required: false,
     },
+    isMockExam: {
+      type: Boolean,
+      default: false,
+    },
+    paperTitle: {
+      type: String,
+      default: "",
+    },
+    subjectBreakdown: [SubjectBreakdownSchema],
     score: {
       type: Number,
       required: true,

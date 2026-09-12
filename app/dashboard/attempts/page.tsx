@@ -112,9 +112,11 @@ export default function StudentAttemptsHistoryPage() {
               {filteredAttempts.map((attempt) => (
                 <tr key={attempt._id} className="hover:bg-slate-50 transition">
                   <td className="py-4 px-2 font-bold text-slate-900">
-                    <div>{attempt.courseId?.title || "Test Bank"}</div>
+                    <div>{attempt.paperTitle || attempt.courseId?.title || "Council Mock Exam"}</div>
                     <div className="text-[11px] font-normal text-slate-500">
-                      Passing Threshold: {attempt.courseId?.passingScorePercentage || 75}%
+                      {attempt.isMockExam
+                        ? "Full Mixed Council Simulation"
+                        : `Passing Threshold: ${attempt.courseId?.passingScorePercentage || 75}%`}
                     </div>
                   </td>
 

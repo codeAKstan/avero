@@ -114,7 +114,7 @@ export default function StudentAttemptDetailReviewPage({
               {attempt.mode} Mode Review
             </span>
             <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight mt-1">
-              {attempt.courseId?.title || "Test Bank Performance"}
+              {attempt.paperTitle || attempt.courseId?.title || "Council Mock Exam Performance"}
             </h1>
             <p className="text-xs text-slate-500 mt-1">
               Attempt completed on {new Date(attempt.createdAt).toLocaleString()}
@@ -172,10 +172,35 @@ export default function StudentAttemptDetailReviewPage({
           <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
             <div className="text-slate-400 font-semibold uppercase text-[9px]">Passing Threshold</div>
             <div className="text-2xl font-extrabold text-blue-600 mt-1">
-              {attempt.courseId?.passingScorePercentage || 75}%
+              {attempt.isMockExam ? "50%" : `${attempt.courseId?.passingScorePercentage || 75}%`}
             </div>
           </div>
         </div>
+
+        {/* Subject-by-Subject Breakdown Card for Mock Exams */}
+        {attempt.subjectBreakdown && attempt.subjectBreakdown.length > 0 && (
+          <div className="pt-4 border-t border-slate-100 space-y-4">
+            <h3 className="text-sm font-bold text-slate-900">
+              Subject & Course Accuracy Breakdown
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {attempt.subjectBreakdown.map((sub: any, idx: number) => (
+                <div
+                  key={idx}
+                  className="p-3.5 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between text-xs"
+                >
+                  <div>
+                    <div className="font-bold text-slate-900">{sub.courseTitle}</div>
+                    <div className="text-slate-500 text-[11px]">
+                      {sub.correctCount} / {sub.totalQuestions} correct
+                    </div>
+                  </div>
+                  <div className="font-extrabold text-sm text-[#2866e1]">{sub.score}%</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Rationale Filter Bar */}

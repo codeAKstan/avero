@@ -21,6 +21,7 @@ import {
   Calendar,
   Zap,
   Sparkles,
+  Award,
 } from "lucide-react";
 import PaywallModal from "@/components/PaywallModal";
 
@@ -65,6 +66,7 @@ export default function StudentDashboardLayout({
   const navItems = [
     { label: "Dashboard Overview", href: "/dashboard", icon: LayoutDashboard },
     { label: "Courses & Test Banks", href: "/dashboard/courses", icon: BookOpen },
+    { label: "Council Mock Simulator", href: "/dashboard/mock-exam", icon: Award, isProOnly: true },
     { label: "Practical Questions", href: "/dashboard/practicals", icon: GraduationCap, isProOnly: true },
     { label: "Active Flashcards (SM-2)", href: "/dashboard/flashcards", icon: Brain },
     { label: "Saved Questions", href: "/dashboard/bookmarks", icon: Bookmark },
