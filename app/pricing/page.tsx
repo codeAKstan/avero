@@ -151,7 +151,7 @@ export default function PricingPage() {
               </div>
 
               <div className="py-2">
-                {loading ? (
+                {loading || monthlyPrice === null || annualPrice === null ? (
                   <div className="h-12 flex items-center text-slate-400 text-sm">
                     <Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading prices...
                   </div>
@@ -194,28 +194,28 @@ export default function PricingPage() {
             <div className="space-y-2">
               <button
                 onClick={() => handleCheckout("pro_monthly")}
-                disabled={loadingPlan !== null}
-                className="w-full py-3.5 bg-[#2866e1] hover:bg-[#1d52bf] text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 transition cursor-pointer"
+                disabled={loadingPlan !== null || monthlyPrice === null}
+                className="w-full py-3.5 bg-[#2866e1] hover:bg-[#1d52bf] text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 transition cursor-pointer disabled:opacity-50"
               >
                 {loadingPlan === "pro_monthly" ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <>
-                    <CreditCard className="w-4 h-4" /> Subscribe Monthly (₦{monthlyPrice.toLocaleString()})
+                    <CreditCard className="w-4 h-4" /> Subscribe Monthly {monthlyPrice !== null ? `(₦${monthlyPrice.toLocaleString()})` : ""}
                   </>
                 )}
               </button>
 
               <button
                 onClick={() => handleCheckout("pro_annual")}
-                disabled={loadingPlan !== null}
-                className="w-full py-2.5 bg-blue-100/70 hover:bg-blue-200/80 text-[#2866e1] font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition cursor-pointer"
+                disabled={loadingPlan !== null || annualPrice === null}
+                className="w-full py-2.5 bg-blue-100/70 hover:bg-blue-200/80 text-[#2866e1] font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition cursor-pointer disabled:opacity-50"
               >
                 {loadingPlan === "pro_annual" ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <>
-                    Subscribe Annual (₦{annualPrice.toLocaleString()})
+                    Subscribe Annual {annualPrice !== null ? `(₦${annualPrice.toLocaleString()})` : ""}
                   </>
                 )}
               </button>

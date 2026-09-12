@@ -20,7 +20,9 @@ import {
   Bookmark,
   Calendar,
   Zap,
+  Sparkles,
 } from "lucide-react";
+import PaywallModal from "@/components/PaywallModal";
 
 export default function StudentDashboardLayout({
   children,
@@ -30,6 +32,7 @@ export default function StudentDashboardLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showPaywallModal, setShowPaywallModal] = useState(false);
   const [studentUser, setStudentUser] = useState<{
     fullName: string;
     email: string;
@@ -181,6 +184,16 @@ export default function StudentDashboardLayout({
             </p>
           </div>
 
+          {!studentUser?.isPro && (
+            <button
+              onClick={() => setShowPaywallModal(true)}
+              className="w-full mb-2.5 flex items-center justify-center gap-1.5 py-2 px-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl text-xs font-extrabold transition shadow-xs cursor-pointer"
+            >
+              <Zap className="w-3.5 h-3.5 fill-white" />
+              <span>Upgrade to Pro</span>
+            </button>
+          )}
+
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl text-xs font-semibold transition cursor-pointer"
@@ -205,12 +218,21 @@ export default function StudentDashboardLayout({
             </span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {studentUser?.university && (
               <div className="flex items-center gap-2 px-3 py-1.5 bg-[#2866e1]/10 border border-[#2866e1]/20 rounded-full text-xs text-[#2866e1] font-semibold">
                 <UserCheck className="w-3.5 h-3.5" />
                 <span>{studentUser.university}</span>
               </div>
+            )}
+            {!studentUser?.isPro && (
+              <button
+                onClick={() => setShowPaywallModal(true)}
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl text-xs font-extrabold shadow-sm hover:shadow-md transition cursor-pointer shrink-0"
+              >
+                <Zap className="w-3.5 h-3.5 fill-white" />
+                <span>Upgrade to Pro</span>
+              </button>
             )}
             <Link
               href="/dashboard/courses"
@@ -224,6 +246,13 @@ export default function StudentDashboardLayout({
 
         <div className="flex-1 p-4 md:p-8">{children}</div>
       </main>
+
+      <PaywallModal
+        isOpen={showPaywallModal}
+        onClose={() => setShowPaywallModal(false)}
+        title="Upgrade to Avero Pro"
+        description="Get full access to all past question banks, procedure flashcards, study planners, and practical exam rationales."
+      />
     </div>
   );
 }

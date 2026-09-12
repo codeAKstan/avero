@@ -14,7 +14,10 @@ import {
   Eye,
   EyeOff,
   KeyRound,
+  Zap,
+  Sparkles,
 } from "lucide-react";
+import PaywallModal from "@/components/PaywallModal";
 
 export default function StudentSettingsPage() {
   const [fullName, setFullName] = useState("");
@@ -23,6 +26,8 @@ export default function StudentSettingsPage() {
   const [university, setUniversity] = useState("");
   const [gradYear, setGradYear] = useState("");
   const [role, setRole] = useState("");
+  const [isPro, setIsPro] = useState(false);
+  const [showPaywallModal, setShowPaywallModal] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -49,6 +54,7 @@ export default function StudentSettingsPage() {
           setUniversity(u.university || "");
           setGradYear(u.gradYear || "");
           setRole(u.role || "student");
+          setIsPro(Boolean(u.isPro));
         }
       })
       .catch((err) => console.error("Error loading profile:", err))
@@ -141,14 +147,59 @@ export default function StudentSettingsPage() {
   return (
     <div className="space-y-8 animate-in fade-in max-w-3xl mx-auto pb-12">
       {/* Header */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs">
-        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-          Student Profile & Security Settings
-        </h1>
-        <p className="text-xs md:text-sm text-slate-500 mt-1">
-          Manage your student profile details, specialization, and account security.
-        </p>
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+            Student Profile & Security Settings
+          </h1>
+          <p className="text-xs md:text-sm text-slate-500 mt-1">
+            Manage your student profile details, specialization, and account security.
+          </p>
+        </div>
+
+        {!isPro ? (
+          <button
+            type="button"
+            onClick={() => setShowPaywallModal(true)}
+            className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+          >
+            <Zap className="w-4 h-4 fill-white" />
+            <span>Upgrade to Pro</span>
+          </button>
+        ) : (
+          <span className="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-bold flex items-center gap-1.5 shrink-0">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Active Pro Member
+          </span>
+        )}
       </div>
+
+      {/* Pro Membership Banner for Free Users */}
+      {!isPro && (
+        <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-300/60 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs shrink-0">
+              <Zap className="w-5 h-5 fill-white" />
+            </div>
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-extrabold text-slate-900">Unlock Avero Pro Membership</h3>
+                <span className="px-2 py-0.5 bg-slate-200 text-slate-700 text-[10px] font-bold rounded-full uppercase">Basic</span>
+              </div>
+              <p className="text-xs text-slate-600">
+                Get full access to all past question banks, procedure flashcards, and OSCE practical exam guides.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowPaywallModal(true)}
+            className="px-5 py-2 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-2 shrink-0 cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Upgrade Now</span>
+          </button>
+        </div>
+      )}
 
       {/* Profile Form Card */}
       <div className="bg-white border border-slate-200/80 rounded-2xl p-6 md:p-8 shadow-xs space-y-6">
@@ -396,6 +447,13 @@ export default function StudentSettingsPage() {
           </div>
         </form>
       </div>
+
+      <PaywallModal
+        isOpen={showPaywallModal}
+        onClose={() => setShowPaywallModal(false)}
+        title="Upgrade to Avero Pro Membership"
+        description="Get full access to all past question banks, procedure flashcard guides, study planners, and practical exam rationales."
+      />
     </div>
   );
 }

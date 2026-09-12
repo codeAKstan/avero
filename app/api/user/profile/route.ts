@@ -3,6 +3,8 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { getUserFromSession } from "@/lib/userAuth";
 import User from "@/models/User";
 
+import { isProUser } from "@/lib/subscription";
+
 export async function GET() {
   try {
     const user = await getUserFromSession();
@@ -21,6 +23,7 @@ export async function GET() {
         university: user.university,
         gradYear: user.gradYear,
         isOnboarded: user.isOnboarded,
+        isPro: isProUser(user),
       },
     });
   } catch (error: any) {

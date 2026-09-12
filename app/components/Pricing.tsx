@@ -10,8 +10,8 @@ export function Pricing() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
 
-  const [monthlyPrice, setMonthlyPrice] = useState(5000);
-  const [annualPrice, setAnnualPrice] = useState(50000);
+  const [monthlyPrice, setMonthlyPrice] = useState<number | null>(null);
+  const [annualPrice, setAnnualPrice] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -127,7 +127,7 @@ export function Pricing() {
               Pro Student
             </div>
             <div className="flex items-baseline gap-1 mb-2">
-              {loading ? (
+              {loading || monthlyPrice === null ? (
                 <div className="h-10 flex items-center text-slate-400 text-xs">
                   <Loader2 className="w-4 h-4 animate-spin mr-1.5" /> Loading price...
                 </div>

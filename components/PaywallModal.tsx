@@ -18,8 +18,8 @@ export default function PaywallModal({
 }: PaywallModalProps) {
   const [loadingPlan, setLoadingPlan] = useState<"pro_monthly" | "pro_annual" | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
-  const [monthlyPrice, setMonthlyPrice] = useState<number>(5000);
-  const [annualPrice, setAnnualPrice] = useState<number>(50000);
+  const [monthlyPrice, setMonthlyPrice] = useState<number | null>(null);
+  const [annualPrice, setAnnualPrice] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -156,7 +156,15 @@ export default function PaywallModal({
             className="p-4 bg-white border-2 border-slate-200 hover:border-[#2866e1] rounded-2xl text-left transition relative group cursor-pointer"
           >
             <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Monthly Pass</div>
-            <div className="text-xl font-extrabold text-slate-900 mt-1">₦{monthlyPrice.toLocaleString()} <span className="text-xs text-slate-500 font-normal">/ mo</span></div>
+            <div className="text-xl font-extrabold text-slate-900 mt-1">
+              {monthlyPrice !== null ? (
+                <>
+                  ₦{monthlyPrice.toLocaleString()} <span className="text-xs text-slate-500 font-normal">/ mo</span>
+                </>
+              ) : (
+                <span className="inline-block w-20 h-6 bg-slate-200 animate-pulse rounded my-0.5" />
+              )}
+            </div>
             <div className="text-[10px] text-slate-500 mt-0.5">Flexible monthly billing</div>
             
             <div className="mt-3 flex items-center gap-1.5 text-xs font-bold text-[#2866e1]">
@@ -181,7 +189,15 @@ export default function PaywallModal({
               Save 17%
             </div>
             <div className="text-[11px] font-bold text-[#2866e1] uppercase tracking-wider">Annual Pass</div>
-            <div className="text-xl font-extrabold text-slate-900 mt-1">₦{annualPrice.toLocaleString()} <span className="text-xs text-slate-500 font-normal">/ yr</span></div>
+            <div className="text-xl font-extrabold text-slate-900 mt-1">
+              {annualPrice !== null ? (
+                <>
+                  ₦{annualPrice.toLocaleString()} <span className="text-xs text-slate-500 font-normal">/ yr</span>
+                </>
+              ) : (
+                <span className="inline-block w-24 h-6 bg-slate-200 animate-pulse rounded my-0.5" />
+              )}
+            </div>
             <div className="text-[10px] text-slate-500 mt-0.5">Full year unlimited access</div>
 
             <div className="mt-3 flex items-center gap-1.5 text-xs font-bold text-[#2866e1]">
