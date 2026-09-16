@@ -29,6 +29,7 @@ export interface IUser extends Document {
   subscriptionExpiresAt?: Date;
   lastExpiringNoticeSentDate?: Date;
   lastExpiredNoticeSentDate?: Date;
+  currentSessionId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -147,6 +148,10 @@ const UserSchema: Schema<IUser> = new Schema(
     },
     lastExpiredNoticeSentDate: {
       type: Date,
+    },
+    currentSessionId: {
+      type: String,
+      default: "",
     },
   },
   {

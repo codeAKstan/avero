@@ -11,6 +11,7 @@ export interface IUserJwtPayload {
   userId: string;
   email: string;
   role: string;
+  sessionId?: string;
 }
 
 export function signUserToken(payload: IUserJwtPayload): string {
@@ -37,6 +38,11 @@ export async function getUserFromSession(): Promise<IUser | null> {
     await connectToDatabase();
     const user = await User.findById(decoded.userId);
     if (!user || user.isSuspended) return null;
+
+    // Enforce 1 active device session per user account
+    if (user.currentSessionId && decoded.sessionId && decoded.sessionId !== user.currentSessionId) {
+      return null;
+    }
 
     return user;
   } catch (error) {

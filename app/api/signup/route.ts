@@ -74,10 +74,15 @@ export async function POST(request: Request) {
       content: `Dear ${fullName},\n\nWelcome to AVERO ACADEMY! Your account has been saved in our MongoDB database and initialized for ${studentType || "Healthcare Candidate"} at ${university || "School of Nursing"}.\n\nA confirmation email has been dispatched to ${normalizedEmail}.`,
     };
 
+    const sessionId = crypto.randomUUID();
+    user.currentSessionId = sessionId;
+    await user.save();
+
     const token = signUserToken({
       userId: (user._id as any).toString(),
       email: user.email,
       role: user.role,
+      sessionId,
     });
 
     const response = NextResponse.json(

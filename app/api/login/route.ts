@@ -43,13 +43,17 @@ export async function POST(request: Request) {
       }
     } else if (password && password.trim().length > 0) {
       user.passwordHash = await bcrypt.hash(password, 10);
-      await user.save();
     }
+
+    const sessionId = crypto.randomUUID();
+    user.currentSessionId = sessionId;
+    await user.save();
 
     const token = signUserToken({
       userId: (user._id as any).toString(),
       email: user.email,
       role: user.role,
+      sessionId,
     });
 
     const response = NextResponse.json(

@@ -44,14 +44,22 @@ export default function StudentDashboardLayout({
 
   useEffect(() => {
     fetch("/api/user/me")
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+          router.push("/login?reason=session_expired");
+          return null;
+        }
+        return res.json();
+      })
       .then((data) => {
-        if (data.success && data.user) {
+        if (data && data.success && data.user) {
           setStudentUser(data.user);
+        } else if (data && !data.success) {
+          router.push("/login?reason=session_expired");
         }
       })
       .catch(() => {});
-  }, [pathname]);
+  }, [pathname, router]);
 
   const handleLogout = async () => {
     try {

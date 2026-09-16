@@ -53,10 +53,15 @@ export async function POST(request: Request) {
       );
     }
 
+    const sessionId = crypto.randomUUID();
+    user.currentSessionId = sessionId;
+    await user.save();
+
     const token = signAdminToken({
       userId: user._id.toString(),
       email: user.email,
       role: user.role,
+      sessionId,
     });
 
     const response = NextResponse.json(

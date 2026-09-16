@@ -11,6 +11,7 @@ export interface IAdminJwtPayload {
   userId: string;
   email: string;
   role: string;
+  sessionId?: string;
 }
 
 export function signAdminToken(payload: IAdminJwtPayload): string {
@@ -37,6 +38,11 @@ export async function getAdminFromSession(): Promise<IUser | null> {
     await connectToDatabase();
     const admin = await User.findById(decoded.userId);
     if (!admin || admin.role !== "admin" || admin.isSuspended) return null;
+
+    // Enforce 1 active device session per admin account
+    if (admin.currentSessionId && decoded.sessionId && decoded.sessionId !== admin.currentSessionId) {
+      return null;
+    }
 
     return admin;
   } catch (error) {
