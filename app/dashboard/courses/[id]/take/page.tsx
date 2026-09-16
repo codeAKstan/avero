@@ -17,7 +17,7 @@ import {
   AlertTriangle,
   Bookmark,
 } from "lucide-react";
-import { shuffleArray } from "@/lib/utils";
+import { shuffleArray, isOptionCorrect } from "@/lib/utils";
 
 import PaywallModal from "@/components/PaywallModal";
 
@@ -166,7 +166,8 @@ export default function StudentExamRunnerPage({
     try {
       const answersPayload = course.questions.map((q: any, idx: number) => {
         const userChoice = userAnswers[idx] || "";
-        const isCorrect = userChoice.trim().toLowerCase() === q.correctAnswer.trim().toLowerCase();
+        const userOptIdx = q.options ? q.options.indexOf(userChoice) : -1;
+        const isCorrect = isOptionCorrect(userChoice, userOptIdx, q.correctAnswer);
         return {
           questionId: q._id || `q_${idx}`,
           questionText: q.question,
@@ -334,8 +335,7 @@ export default function StudentExamRunnerPage({
           <div className="space-y-3 pt-2">
             {currentQ.options.map((opt: string, optIdx: number) => {
               const isSelected = selectedChoice === opt;
-              const isCorrectAnswer =
-                opt.trim().toLowerCase() === currentQ.correctAnswer.trim().toLowerCase();
+              const isCorrectAnswer = isOptionCorrect(opt, optIdx, currentQ.correctAnswer);
 
               let borderStyle = "border-slate-200 hover:border-slate-300 bg-white";
               if (isSelected) {
@@ -378,7 +378,11 @@ export default function StudentExamRunnerPage({
           {mode === "Practice" && selectedChoice && (
             <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 animate-in fade-in">
               <div className="flex items-center gap-2 text-xs font-bold">
-                {selectedChoice.trim().toLowerCase() === currentQ.correctAnswer.trim().toLowerCase() ? (
+                {isOptionCorrect(
+                  selectedChoice,
+                  currentQ.options.indexOf(selectedChoice),
+                  currentQ.correctAnswer
+                ) ? (
                   <span className="flex items-center gap-1.5 text-emerald-700">
                     <CheckCircle2 className="w-4 h-4" /> Correct Answer!
                   </span>
