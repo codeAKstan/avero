@@ -91,12 +91,19 @@ export default function StudentExamRunnerPage({
           let reqCount = countParam ? parseInt(countParam, 10) : totalAvailable;
           if (isNaN(reqCount) || reqCount <= 0) reqCount = totalAvailable;
 
-          // Always shuffle question presentation order randomly for each session
-          const randomizedQuestions = shuffleArray(loadedCourse.questions || []);
+          // Shuffle questions and options based on per-course Admin settings
+          const processedQuestions = (
+            loadedCourse.randomizeQuestions
+              ? shuffleArray(loadedCourse.questions || [])
+              : loadedCourse.questions || []
+          ).map((q: any) => ({
+            ...q,
+            options: loadedCourse.randomizeOptions ? shuffleArray(q.options || []) : q.options || [],
+          }));
 
           loadedCourse = {
             ...loadedCourse,
-            questions: randomizedQuestions.slice(0, reqCount),
+            questions: processedQuestions.slice(0, reqCount),
           };
 
           setCourse(loadedCourse);

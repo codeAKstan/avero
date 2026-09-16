@@ -65,6 +65,8 @@ export async function POST(request: Request) {
       sourceDocumentUrl,
       isFreeAccess,
       freeQuestionLimit,
+      randomizeQuestions,
+      randomizeOptions,
     } = body;
 
     if (!title || !categoryId || !description) {
@@ -108,6 +110,8 @@ export async function POST(request: Request) {
       sourceDocumentUrl: sourceDocumentUrl || "",
       isFreeAccess: isFreeAccess !== undefined ? Boolean(isFreeAccess) : true,
       freeQuestionLimit: typeof freeQuestionLimit === "number" ? freeQuestionLimit : 5,
+      randomizeQuestions: Boolean(randomizeQuestions),
+      randomizeOptions: Boolean(randomizeOptions),
     });
 
     return NextResponse.json({
