@@ -14,6 +14,9 @@ import {
   Shield,
   Loader2,
   RefreshCw,
+  Zap,
+  Crown,
+  CreditCard,
 } from "lucide-react";
 
 interface IStats {
@@ -23,9 +26,15 @@ interface IStats {
   totalAdmins: number;
   onboardedUsers: number;
   onboardedPercentage: number;
+  totalProUsers?: number;
+  activeProUsers?: number;
+  expiredProUsers?: number;
+  proPercentage?: number;
   totalCategories: number;
   totalCourses: number;
   publishedCourses: number;
+  totalRevenue?: number;
+  totalTransactions?: number;
 }
 
 export default function AdminDashboardPage() {
@@ -94,7 +103,7 @@ export default function AdminDashboardPage() {
           <span className="text-sm">Loading telemetry metrics...</span>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Total Users */}
           <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:border-[#2866e1]/40 transition">
             <div className="flex items-center justify-between mb-3">
@@ -108,9 +117,32 @@ export default function AdminDashboardPage() {
             <div className="text-3xl font-extrabold text-slate-900">{stats?.totalUsers || 0}</div>
             <div className="mt-2 text-xs text-slate-500 flex items-center gap-1.5 font-medium">
               <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>{stats?.onboardedUsers || 0} fully onboarded ({stats?.onboardedPercentage || 0}%)</span>
+              <span>{stats?.onboardedUsers || 0} onboarded ({stats?.onboardedPercentage || 0}%)</span>
             </div>
           </div>
+
+          {/* Pro Users */}
+          <Link
+            href="/admin/pro-users"
+            className="bg-white border border-amber-200/80 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:border-amber-400 transition group"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-amber-700 transition">
+                Pro Users
+              </span>
+              <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center group-hover:scale-105 transition">
+                <Zap className="w-5 h-5 fill-amber-500 text-amber-600" />
+              </div>
+            </div>
+            <div className="text-3xl font-extrabold text-slate-900 flex items-baseline gap-2">
+              <span>{stats?.totalProUsers || 0}</span>
+              <span className="text-xs text-amber-600 font-bold">({stats?.proPercentage || 0}%)</span>
+            </div>
+            <div className="mt-2 text-xs text-slate-500 flex items-center gap-1 font-medium">
+              <Crown className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+              <span>{stats?.activeProUsers || 0} active subscriptions</span>
+            </div>
+          </Link>
 
           {/* Students vs Educators */}
           <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:border-[#2866e1]/40 transition">
@@ -182,6 +214,42 @@ export default function AdminDashboardPage() {
             </p>
 
             <div className="space-y-3">
+              <Link
+                href="/admin/transactions"
+                className="flex items-center justify-between p-3.5 bg-emerald-50/70 hover:bg-emerald-100/70 border border-emerald-200 rounded-xl transition text-sm font-semibold text-slate-800 group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700">
+                    <CreditCard className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-slate-900 group-hover:text-emerald-800">
+                      Payment Transactions & Revenue
+                    </div>
+                    <div className="text-xs font-normal text-slate-500">View Paystack payment logs & revenue</div>
+                  </div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-700 group-hover:translate-x-1 transition-transform" />
+              </Link>
+
+              <Link
+                href="/admin/pro-users"
+                className="flex items-center justify-between p-3.5 bg-amber-50/70 hover:bg-amber-100/70 border border-amber-200 rounded-xl transition text-sm font-semibold text-slate-800 group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-amber-100 text-amber-700">
+                    <Zap className="w-4 h-4 fill-amber-500 text-amber-600" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-slate-900 group-hover:text-amber-800">
+                      Pro Users Directory
+                    </div>
+                    <div className="text-xs font-normal text-slate-500">View & manage all Pro subscribers</div>
+                  </div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-700 group-hover:translate-x-1 transition-transform" />
+              </Link>
+
               <Link
                 href="/admin/courses/new"
                 className="flex items-center justify-between p-3.5 bg-[#f5f8ff] hover:bg-[#ebf2ff] border border-[#2866e1]/20 rounded-xl transition text-sm font-semibold text-slate-800 group"

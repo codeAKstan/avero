@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     const search = searchParams.get("search") || "";
     const role = searchParams.get("role") || "all";
     const status = searchParams.get("status") || "all";
+    const plan = searchParams.get("plan") || "all";
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
 
@@ -34,6 +35,31 @@ export async function GET(request: Request) {
       query.isOnboarded = false;
     } else if (status === "suspended") {
       query.isSuspended = true;
+    }
+
+    const now = new Date();
+    if (plan === "pro") {
+      query.subscriptionPlan = "pro";
+    } else if (plan === "active_pro") {
+      query.subscriptionPlan = "pro";
+      query.$or = [
+        ...(query.$or || []),
+      ];
+      // If search wasn't applied, handle active expiration date check
+      query.$and = [
+        {
+          $or: [
+            { subscriptionExpiresAt: { $gt: now } },
+            { subscriptionExpiresAt: null },
+            { subscriptionExpiresAt: { $exists: false } },
+          ],
+        },
+      ];
+    } else if (plan === "expired_pro") {
+      query.subscriptionPlan = "pro";
+      query.subscriptionExpiresAt = { $lte: now };
+    } else if (plan === "free") {
+      query.subscriptionPlan = { $ne: "pro" };
     }
 
     const skip = (page - 1) * limit;

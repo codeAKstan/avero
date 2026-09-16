@@ -19,6 +19,8 @@ import {
   ShieldCheck,
   ChevronRight,
   Settings,
+  Zap,
+  CreditCard,
 } from "lucide-react";
 
 export default function AdminLayout({
@@ -60,6 +62,8 @@ export default function AdminLayout({
   const navItems = [
     { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { label: "User Management", href: "/admin/users", icon: Users },
+    { label: "Pro Users", href: "/admin/pro-users", icon: Zap },
+    { label: "Transactions", href: "/admin/transactions", icon: CreditCard },
     { label: "Course Categories", href: "/admin/categories", icon: FolderTree },
     { label: "Courses & Content", href: "/admin/courses", icon: BookOpen },
     { label: "OCR AI Builder", href: "/admin/courses/new", icon: Plus },
