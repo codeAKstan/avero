@@ -22,6 +22,7 @@ import {
   Lock,
 } from "lucide-react";
 import PaywallModal from "@/components/PaywallModal";
+import { isAnswerMatch } from "@/lib/questionUtils";
 
 interface QuestionItem {
   _id?: string;
@@ -131,7 +132,7 @@ function TimedMockExamContent() {
 
       const formattedAnswers = questions.map((q, idx) => {
         const userChoice = answers[idx] || "";
-        const isCorrect = userChoice.trim().toLowerCase() === q.correctAnswer.trim().toLowerCase();
+        const isCorrect = isAnswerMatch(userChoice, q.correctAnswer);
         return {
           questionId: q._id || "",
           courseId: q.courseId || "",

@@ -15,6 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import PaywallModal from "@/components/PaywallModal";
+import { isAnswerMatch } from "@/lib/questionUtils";
 
 export default function PracticalQuestionsPage() {
   const [loading, setLoading] = useState(true);
@@ -360,7 +361,7 @@ export default function PracticalQuestionsPage() {
                           const isCurr = currentQuestionIndex === idx;
                           let dotStyle = "bg-white text-slate-600 border-slate-200 hover:bg-slate-100";
                           if (ans) {
-                            const isRight = ans === selectedModule.questions[idx].correctAnswer;
+                            const isRight = isAnswerMatch(ans, selectedModule.questions[idx].correctAnswer);
                             dotStyle = isRight
                               ? "bg-emerald-600 text-white border-emerald-600 font-bold"
                               : "bg-rose-600 text-white border-rose-600 font-bold";
@@ -387,7 +388,7 @@ export default function PracticalQuestionsPage() {
                       const q = selectedModule.questions[qIdx];
                       const selectedOpt = userAnswers[qIdx];
                       const isAnswered = Boolean(selectedOpt);
-                      const isCorrect = selectedOpt === q.correctAnswer;
+                      const isCorrect = isAnswerMatch(selectedOpt, q.correctAnswer);
 
                       return (
                         <div className="p-6 bg-slate-50/80 border border-slate-200 rounded-2xl space-y-5 shadow-xs">
@@ -426,7 +427,7 @@ export default function PracticalQuestionsPage() {
                           <div className="space-y-2.5">
                             {q.options?.map((opt: string, optIdx: number) => {
                               const isThisSelected = selectedOpt === opt;
-                              const isThisCorrectAnswer = q.correctAnswer === opt;
+                              const isThisCorrectAnswer = isAnswerMatch(opt, q.correctAnswer);
 
                               let optionStyle =
                                 "bg-white border-slate-200 text-slate-800 hover:bg-slate-100/90";

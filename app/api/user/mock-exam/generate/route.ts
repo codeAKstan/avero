@@ -5,6 +5,7 @@ import { isProUser } from "@/lib/subscription";
 import Course, { ICourse, IQuestion } from "@/models/Course";
 import Category from "@/models/Category";
 import User from "@/models/User";
+import { normalizeOptionText } from "@/lib/questionUtils";
 
 export async function GET(request: Request) {
   try {
@@ -69,8 +70,8 @@ export async function GET(request: Request) {
             pooledQuestions.push({
               _id: q._id ? q._id.toString() : "",
               question: q.question,
-              options: q.options,
-              correctAnswer: q.correctAnswer,
+              options: Array.isArray(q.options) ? q.options.map((opt: string) => normalizeOptionText(opt)) : [],
+              correctAnswer: normalizeOptionText(q.correctAnswer),
               explanation: q.explanation || "",
               questionType: q.questionType || "standard",
               practicalTitle: q.practicalTitle || "",

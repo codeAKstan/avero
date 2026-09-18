@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Course from "@/models/Course";
 import Category from "@/models/Category";
+import { sanitizeQuestions } from "@/lib/questionUtils";
 
 export async function GET(request: Request) {
   try {
@@ -105,7 +106,7 @@ export async function POST(request: Request) {
       passingScorePercentage: typeof passingScorePercentage === "number" ? passingScorePercentage : 75,
       allowedModes: Array.isArray(allowedModes) ? allowedModes : ["Practice", "Exam"],
       modules: modules || [],
-      questions: questions || [],
+      questions: sanitizeQuestions(questions || []),
       sourceDocumentUrl: sourceDocumentUrl || "",
       isFreeAccess: isFreeAccess !== undefined ? Boolean(isFreeAccess) : true,
       freeQuestionLimit: typeof freeQuestionLimit === "number" ? freeQuestionLimit : 5,

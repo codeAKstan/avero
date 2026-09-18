@@ -13,6 +13,7 @@ import {
 
 import PaywallModal from "@/components/PaywallModal";
 import { Lock, ArrowRight } from "lucide-react";
+import { isAnswerMatch } from "@/lib/questionUtils";
 
 export default function BookmarksPage() {
   const [bookmarks, setBookmarks] = useState<any[]>([]);
@@ -191,7 +192,7 @@ export default function BookmarksPage() {
               {bm.options && bm.options.length > 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                   {bm.options.map((opt: string, idx: number) => {
-                    const isCorrect = opt.trim().toLowerCase() === bm.correctAnswer.trim().toLowerCase();
+                    const isCorrect = isAnswerMatch(opt, bm.correctAnswer);
                     return (
                       <div
                         key={idx}
