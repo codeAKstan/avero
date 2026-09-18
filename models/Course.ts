@@ -39,7 +39,6 @@ export interface ICourse extends Document {
   isFreeAccess?: boolean;
   freeQuestionLimit?: number;
   randomizeQuestions?: boolean;
-  randomizeOptions?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -137,10 +136,6 @@ const CourseSchema: Schema<ICourse> = new Schema(
       default: 5,
     },
     randomizeQuestions: {
-      type: Boolean,
-      default: false,
-    },
-    randomizeOptions: {
       type: Boolean,
       default: false,
     },

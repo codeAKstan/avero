@@ -159,19 +159,6 @@ export default function CourseManagementPage() {
     }
   };
 
-  const toggleRandomizeOptions = async (course: any) => {
-    try {
-      const res = await fetch(`/api/admin/courses/${course._id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ randomizeOptions: !course.randomizeOptions }),
-      });
-      if (res.ok) fetchCourses();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this course and all its questions/modules?")) return;
     try {
@@ -418,32 +405,18 @@ export default function CourseManagementPage() {
                     <td className="py-4 px-4 text-slate-700 font-semibold">
                       <div>{course.questions?.length || 0} Questions</div>
                       <div className="text-[11px] text-slate-400 font-normal mb-1">{course.modules?.length || 0} Modules</div>
-                      <div className="flex flex-wrap gap-1">
-                        <button
-                          type="button"
-                          onClick={() => toggleRandomize(course)}
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold transition cursor-pointer ${
-                            course.randomizeQuestions
-                              ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
-                              : "bg-slate-100 text-slate-500 border border-slate-200"
-                          }`}
-                          title="Click to toggle question order randomization for students"
-                        >
-                          <span>{course.randomizeQuestions ? "🔀 Questions" : "Seq Qs"}</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => toggleRandomizeOptions(course)}
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold transition cursor-pointer ${
-                            course.randomizeOptions
-                              ? "bg-[#2866e1]/10 text-[#2866e1] border border-[#2866e1]/20"
-                              : "bg-slate-100 text-slate-500 border border-slate-200"
-                          }`}
-                          title="Click to toggle answer choices (options) randomization for students"
-                        >
-                          <span>{course.randomizeOptions ? "🎲 Options" : "Seq Opts"}</span>
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => toggleRandomize(course)}
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold transition cursor-pointer ${
+                          course.randomizeQuestions
+                            ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
+                            : "bg-slate-100 text-slate-500 border border-slate-200"
+                        }`}
+                        title="Click to toggle question order randomization for students"
+                      >
+                        <span>{course.randomizeQuestions ? "🔀 Randomized" : "Sequential"}</span>
+                      </button>
                     </td>
                     <td className="py-4 px-4">
                       <button

@@ -61,7 +61,6 @@ export async function PATCH(
     if (typeof body.isFreeAccess !== "undefined") course.isFreeAccess = Boolean(body.isFreeAccess);
     if (typeof body.freeQuestionLimit === "number") course.freeQuestionLimit = body.freeQuestionLimit;
     if (typeof body.randomizeQuestions !== "undefined") course.randomizeQuestions = Boolean(body.randomizeQuestions);
-    if (typeof body.randomizeOptions !== "undefined") course.randomizeOptions = Boolean(body.randomizeOptions);
 
     await course.save();
 

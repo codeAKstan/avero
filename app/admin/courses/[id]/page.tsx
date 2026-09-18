@@ -55,7 +55,6 @@ export default function EditCoursePage({
   const [isFreeAccess, setIsFreeAccess] = useState(true);
   const [freeQuestionLimit, setFreeQuestionLimit] = useState(5);
   const [randomizeQuestions, setRandomizeQuestions] = useState(false);
-  const [randomizeOptions, setRandomizeOptions] = useState(false);
 
   // Modules & Questions
   const [modules, setModules] = useState<
@@ -177,7 +176,6 @@ export default function EditCoursePage({
           if (typeof c.isFreeAccess !== "undefined") setIsFreeAccess(Boolean(c.isFreeAccess));
           if (typeof c.freeQuestionLimit === "number") setFreeQuestionLimit(c.freeQuestionLimit);
           if (typeof c.randomizeQuestions !== "undefined") setRandomizeQuestions(Boolean(c.randomizeQuestions));
-          if (typeof c.randomizeOptions !== "undefined") setRandomizeOptions(Boolean(c.randomizeOptions));
         }
       })
       .catch((err) => console.error("Failed to load course", err))
@@ -336,7 +334,6 @@ export default function EditCoursePage({
           isFreeAccess,
           freeQuestionLimit,
           randomizeQuestions,
-          randomizeOptions,
         }),
       });
 
@@ -603,47 +600,25 @@ export default function EditCoursePage({
             )}
           </div>
 
-          {/* Question Order & Answer Options Randomization Controls */}
-          <div className="sm:col-span-2 p-4 bg-indigo-50/60 border border-indigo-200/80 rounded-2xl space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <span>🔀 Question Presentation Order</span>
-                </h4>
-                <p className="text-[11px] text-slate-500">
-                  Randomize the presentation sequence of questions for students taking practice sessions or exams in this course.
-                </p>
-              </div>
-              <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-indigo-200 rounded-xl shrink-0">
-                <input
-                  type="checkbox"
-                  checked={randomizeQuestions}
-                  onChange={(e) => setRandomizeQuestions(e.target.checked)}
-                  className="w-4 h-4 text-[#2866e1] rounded border-slate-300 cursor-pointer"
-                />
-                <span className="text-xs font-bold text-slate-800">Randomize Questions</span>
-              </label>
+          {/* Question Order Randomization Control */}
+          <div className="sm:col-span-2 p-4 bg-indigo-50/60 border border-indigo-200/80 rounded-2xl flex items-center justify-between">
+            <div>
+              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <span>🔀 Question Presentation Order</span>
+              </h4>
+              <p className="text-[11px] text-slate-500">
+                Randomize the presentation sequence of questions for students taking practice sessions or exams in this course.
+              </p>
             </div>
-
-            <div className="flex items-center justify-between border-t border-indigo-100 pt-3">
-              <div>
-                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <span>🎲 Answer Choice Options</span>
-                </h4>
-                <p className="text-[11px] text-slate-500">
-                  Randomize the choice options (A, B, C, D) within each question for candidate attempts.
-                </p>
-              </div>
-              <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-indigo-200 rounded-xl shrink-0">
-                <input
-                  type="checkbox"
-                  checked={randomizeOptions}
-                  onChange={(e) => setRandomizeOptions(e.target.checked)}
-                  className="w-4 h-4 text-[#2866e1] rounded border-slate-300 cursor-pointer"
-                />
-                <span className="text-xs font-bold text-slate-800">Randomize Options</span>
-              </label>
-            </div>
+            <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 border border-indigo-200 rounded-xl shrink-0">
+              <input
+                type="checkbox"
+                checked={randomizeQuestions}
+                onChange={(e) => setRandomizeQuestions(e.target.checked)}
+                className="w-4 h-4 text-[#2866e1] rounded border-slate-300 cursor-pointer"
+              />
+              <span className="text-xs font-bold text-slate-800">Randomize Questions</span>
+            </label>
           </div>
         </div>
 

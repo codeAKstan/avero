@@ -17,7 +17,7 @@ import {
   AlertTriangle,
   Bookmark,
 } from "lucide-react";
-import { shuffleArray, isOptionCorrect } from "@/lib/utils";
+import { shuffleArray } from "@/lib/utils";
 
 import PaywallModal from "@/components/PaywallModal";
 
@@ -91,19 +91,14 @@ export default function StudentExamRunnerPage({
           let reqCount = countParam ? parseInt(countParam, 10) : totalAvailable;
           if (isNaN(reqCount) || reqCount <= 0) reqCount = totalAvailable;
 
-          // Shuffle questions and options based on per-course Admin settings
-          const processedQuestions = (
-            loadedCourse.randomizeQuestions
-              ? shuffleArray(loadedCourse.questions || [])
-              : loadedCourse.questions || []
-          ).map((q: any) => ({
-            ...q,
-            options: loadedCourse.randomizeOptions ? shuffleArray(q.options || []) : q.options || [],
-          }));
+          // Shuffle question presentation order ONLY if enabled by Admin for this course
+          const finalQuestions = loadedCourse.randomizeQuestions
+            ? shuffleArray(loadedCourse.questions || [])
+            : loadedCourse.questions || [];
 
           loadedCourse = {
             ...loadedCourse,
-            questions: processedQuestions.slice(0, reqCount),
+            questions: finalQuestions.slice(0, reqCount),
           };
 
           setCourse(loadedCourse);
@@ -166,8 +161,7 @@ export default function StudentExamRunnerPage({
     try {
       const answersPayload = course.questions.map((q: any, idx: number) => {
         const userChoice = userAnswers[idx] || "";
-        const userOptIdx = q.options ? q.options.indexOf(userChoice) : -1;
-        const isCorrect = isOptionCorrect(userChoice, userOptIdx, q.correctAnswer);
+        const isCorrect = userChoice.trim().toLowerCase() === q.correctAnswer.trim().toLowerCase();
         return {
           questionId: q._id || `q_${idx}`,
           questionText: q.question,
@@ -335,7 +329,8 @@ export default function StudentExamRunnerPage({
           <div className="space-y-3 pt-2">
             {currentQ.options.map((opt: string, optIdx: number) => {
               const isSelected = selectedChoice === opt;
-              const isCorrectAnswer = isOptionCorrect(opt, optIdx, currentQ.correctAnswer);
+              const isCorrectAnswer =
+                opt.trim().toLowerCase() === currentQ.correctAnswer.trim().toLowerCase();
 
               let borderStyle = "border-slate-200 hover:border-slate-300 bg-white";
               if (isSelected) {
@@ -378,11 +373,7 @@ export default function StudentExamRunnerPage({
           {mode === "Practice" && selectedChoice && (
             <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 animate-in fade-in">
               <div className="flex items-center gap-2 text-xs font-bold">
-                {isOptionCorrect(
-                  selectedChoice,
-                  currentQ.options.indexOf(selectedChoice),
-                  currentQ.correctAnswer
-                ) ? (
+                {selectedChoice.trim().toLowerCase() === currentQ.correctAnswer.trim().toLowerCase() ? (
                   <span className="flex items-center gap-1.5 text-emerald-700">
                     <CheckCircle2 className="w-4 h-4" /> Correct Answer!
                   </span>
