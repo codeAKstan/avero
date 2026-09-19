@@ -17,6 +17,7 @@ import {
   Zap,
   Crown,
   CreditCard,
+  Flag,
 } from "lucide-react";
 
 interface IStats {
@@ -35,6 +36,8 @@ interface IStats {
   publishedCourses: number;
   totalRevenue?: number;
   totalTransactions?: number;
+  totalFlaggedQuestions?: number;
+  pendingFlaggedQuestions?: number;
 }
 
 export default function AdminDashboardPage() {
@@ -245,6 +248,29 @@ export default function AdminDashboardPage() {
                       Pro Users Directory
                     </div>
                     <div className="text-xs font-normal text-slate-500">View & manage all Pro subscribers</div>
+                  </div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-700 group-hover:translate-x-1 transition-transform" />
+              </Link>
+
+              <Link
+                href="/admin/flagged-questions"
+                className="flex items-center justify-between p-3.5 bg-amber-50/50 hover:bg-amber-100/50 border border-amber-200/80 rounded-xl transition text-sm font-semibold text-slate-800 group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-amber-100 text-amber-700">
+                    <Flag className="w-4 h-4 text-amber-600 fill-amber-500" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-slate-900 group-hover:text-amber-800 flex items-center gap-2">
+                      <span>Flagged Questions</span>
+                      {stats?.pendingFlaggedQuestions ? (
+                        <span className="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 text-[10px] font-bold">
+                          {stats.pendingFlaggedQuestions} pending
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="text-xs font-normal text-slate-500">Review student reported issues & edits</div>
                   </div>
                 </div>
                 <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-700 group-hover:translate-x-1 transition-transform" />

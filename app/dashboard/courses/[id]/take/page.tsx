@@ -151,8 +151,37 @@ export default function StudentExamRunnerPage({
     }));
   };
 
-  const toggleFlag = (index: number) => {
-    setFlagged((prev) => ({ ...prev, [index]: !prev[index] }));
+  const toggleFlag = async (index: number) => {
+    const isCurrentlyFlagged = !!flagged[index];
+    setFlagged((prev) => ({ ...prev, [index]: !isCurrentlyFlagged }));
+
+    if (!course || !course.questions || !course.questions[index]) return;
+    const q = course.questions[index];
+
+    try {
+      if (isCurrentlyFlagged) {
+        await fetch(`/api/user/flagged-questions?questionText=${encodeURIComponent(q.question)}`, {
+          method: "DELETE",
+        });
+      } else {
+        await fetch("/api/user/flagged-questions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            courseId: course._id,
+            courseTitle: course.title,
+            questionId: q._id || `q_${index}`,
+            questionText: q.question,
+            options: q.options || [],
+            correctAnswer: q.correctAnswer,
+            explanation: q.explanation || "",
+            reason: "Flagged during practice test",
+          }),
+        });
+      }
+    } catch (err) {
+      console.error("Error syncing question flag:", err);
+    }
   };
 
   const handleSubmitTest = async () => {

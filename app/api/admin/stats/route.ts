@@ -5,6 +5,8 @@ import Category from "@/models/Category";
 import Course from "@/models/Course";
 import Payment from "@/models/Payment";
 
+import FlaggedQuestion from "@/models/FlaggedQuestion";
+
 export async function GET() {
   try {
     await connectToDatabase();
@@ -26,6 +28,8 @@ export async function GET() {
       recentUsers,
       successfulPayments,
       totalTransactions,
+      totalFlaggedQuestions,
+      pendingFlaggedQuestions,
     ] = await Promise.all([
       User.countDocuments(),
       User.countDocuments({ role: "student" }),
@@ -51,6 +55,8 @@ export async function GET() {
       User.find().sort({ createdAt: -1 }).limit(5).select("fullName email role university createdAt isOnboarded subscriptionPlan subscriptionExpiresAt"),
       Payment.find({ status: "success" }).select("amountNaira"),
       Payment.countDocuments(),
+      FlaggedQuestion.countDocuments(),
+      FlaggedQuestion.countDocuments({ status: "Pending" }),
     ]);
 
     const totalRevenue = successfulPayments.reduce((sum, p) => sum + (p.amountNaira || 0), 0);
@@ -74,6 +80,8 @@ export async function GET() {
         totalRevenue,
         totalTransactions,
         successfulTransactions: successfulPayments.length,
+        totalFlaggedQuestions,
+        pendingFlaggedQuestions,
       },
       recentUsers,
     });

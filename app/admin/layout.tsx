@@ -21,6 +21,7 @@ import {
   Settings,
   Zap,
   CreditCard,
+  Flag,
 } from "lucide-react";
 
 export default function AdminLayout({
@@ -67,6 +68,7 @@ export default function AdminLayout({
     { label: "Course Categories", href: "/admin/categories", icon: FolderTree },
     { label: "Courses & Content", href: "/admin/courses", icon: BookOpen },
     { label: "OCR AI Builder", href: "/admin/courses/new", icon: Plus },
+    { label: "Flagged Questions", href: "/admin/flagged-questions", icon: Flag },
     { label: "Exam Analytics", href: "/admin/analytics", icon: BarChart3 },
     { label: "System Banners", href: "/admin/announcements", icon: Megaphone },
     { label: "Admin Settings", href: "/admin/settings", icon: Settings },

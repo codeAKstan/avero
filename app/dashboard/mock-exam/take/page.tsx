@@ -211,8 +211,37 @@ function TimedMockExamContent() {
     setAnswers((prev) => ({ ...prev, [currentIndex]: option }));
   };
 
-  const toggleFlag = (index: number) => {
-    setFlagged((prev) => ({ ...prev, [index]: !prev[index] }));
+  const toggleFlag = async (index: number) => {
+    const isCurrentlyFlagged = !!flagged[index];
+    setFlagged((prev) => ({ ...prev, [index]: !isCurrentlyFlagged }));
+
+    if (!questions || !questions[index]) return;
+    const q = questions[index];
+
+    try {
+      if (isCurrentlyFlagged) {
+        await fetch(`/api/user/flagged-questions?questionText=${encodeURIComponent(q.question)}`, {
+          method: "DELETE",
+        });
+      } else {
+        await fetch("/api/user/flagged-questions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            courseId: q.courseId || null,
+            courseTitle: q.courseTitle || paperTitle || "Council Mock Exam",
+            questionId: q._id || `q_${index}`,
+            questionText: q.question,
+            options: q.options || [],
+            correctAnswer: q.correctAnswer,
+            explanation: q.explanation || "",
+            reason: "Flagged during mock exam",
+          }),
+        });
+      }
+    } catch (err) {
+      console.error("Error syncing question flag:", err);
+    }
   };
 
   const answeredCount = Object.keys(answers).length;
