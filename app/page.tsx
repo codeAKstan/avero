@@ -7,6 +7,7 @@ import { Testimonials } from "./components/Testimonials";
 import { Pricing } from "./components/Pricing";
 import { FAQ } from "./components/FAQ";
 import { Footer } from "./components/Footer";
+import { WhatsAppWidget } from "./components/WhatsAppWidget";
 
 export default function Home() {
   return (
@@ -20,6 +21,7 @@ export default function Home() {
       <Pricing />
       <FAQ />
       <Footer />
+      <WhatsAppWidget />
     </main>
   );
 }
